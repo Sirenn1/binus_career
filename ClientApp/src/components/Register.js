@@ -1,27 +1,30 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-const Login = () => {
+const Register = () => {
     return (
         <div style={{ padding: '2rem' }}>
-            <h2>Login</h2>
+            <h2>Register</h2>
             <form>
                 <div>
                     <label>Username:</label><br />
                     <input type="text" name="username" />
                 </div>
                 <div>
+                    <label>Email:</label><br />
+                    <input type="email" name="email" />
+                </div>
+                <div>
                     <label>Password:</label><br />
                     <input type="password" name="password" />
                 </div>
-                <button type="submit">Login</button>
+                <div>
+                    <label>Confirm Password:</label><br />
+                    <input type="password" name="confirmPassword" />
+                </div>
+                <button type="submit">Register</button>
             </form>
-
-            <p style={{ marginTop: '1rem' }}>
-                Don't have an account? <Link to="/register">Register here</Link>
-            </p>
         </div>
     );
 };
 
-export default Login;
+export default Register;
