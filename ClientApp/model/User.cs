@@ -6,6 +6,6 @@ public class User
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
-    public bool IsAdmin { get; set; } = false;     // 0 for PIC, 1 for Admin
-    public bool IsApproved { get; set; } = false;  // approval status
+    public bool IsAdmin { get; set; } = false;     
+    public bool IsApproved { get; set; } = false; 
 }

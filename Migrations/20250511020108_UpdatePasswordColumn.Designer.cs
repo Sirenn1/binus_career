@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using binusCareer.ClientApp.Model;
+
 #nullable disable
 
 namespace binusCareer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250510100709_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250511020108_UpdatePasswordColumn")]
+    partial class UpdatePasswordColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,7 +44,8 @@ namespace binusCareer.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("password");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -51,7 +53,7 @@ namespace binusCareer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

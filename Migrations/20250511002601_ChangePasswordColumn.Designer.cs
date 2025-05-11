@@ -10,8 +10,8 @@ using binusCareer.ClientApp.Model;
 namespace binusCareer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250510100709_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250511002601_ChangePasswordColumn")]
+    partial class ChangePasswordColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,7 @@ namespace binusCareer.Migrations
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

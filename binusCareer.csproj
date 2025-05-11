@@ -14,10 +14,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.0-preview.3.23177.8">
       <!-- The SPA Proxy is only used at development time -->
       <Publish>false</Publish>
     </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

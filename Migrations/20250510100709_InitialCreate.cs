@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-
+using binusCareer.ClientApp.Model;
 #nullable disable
 
 namespace binusCareer.Migrations

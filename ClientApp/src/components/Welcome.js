@@ -7,7 +7,7 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { useNavigate } from "react-router-dom";
 
 
-export function LoginContent() {
+export function Welcome() {
     const navigate = useNavigate(); 
 
     const handleLogin = () => {
@@ -57,4 +57,4 @@ export function LoginContent() {
     );
 }
 
-export default LoginContent;
+export default Welcome;
