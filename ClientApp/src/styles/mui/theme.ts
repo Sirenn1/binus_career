@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
@@ -11,6 +11,35 @@ declare module '@mui/material/styles' {
     error?: React.CSSProperties;
     label?: React.CSSProperties;
   }
+
+  // Extend the theme palette
+  interface Theme {
+    palette: {
+      primary: {
+        main: string;
+        '100': string;
+        contrastText: string;
+      };
+      secondary: {
+        main: string;
+        '100': string;
+        '400': string;
+        contrastText: string;
+      };
+      error: {
+        main: string;
+        '100': string;
+      };
+      warning: {
+        main: string;
+        '100': string;
+      };
+      info: {
+        main: string;
+        '100': string;
+      };
+    };
+  }
 }
 
 // Update the Typography's variant prop options
@@ -20,6 +49,30 @@ declare module '@mui/material/Typography' {
     label: true;
   }
 }
+
+// Define gradient colors
+const gradientColors = {
+  primary: {
+    start: '#F18700',
+    end: '#F39F33'
+  },
+  secondary: {
+    start: '#999999',
+    end: '#B3B3B3'
+  },
+  error: {
+    start: '#9F041B',
+    end: '#F5515F'
+  },
+  warning: {
+    start: '#FFA000',
+    end: '#FFB74D'
+  },
+  info: {
+    start: '#0288D1',
+    end: '#4FC3F7'
+  }
+};
 
 export const themes = createTheme({
   components: {
@@ -148,33 +201,33 @@ export const themes = createTheme({
           padding: '0 8px 0 8px',
         }),
         containedPrimary: ({ theme }) => ({
-          background: `transparent linear-gradient(0deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary['100']} 100%) 0% 0% no-repeat padding-box`,
+          background: `transparent linear-gradient(0deg, ${gradientColors.primary.start} 0%, ${gradientColors.primary.end} 100%) 0% 0% no-repeat padding-box`,
           ':hover': {
-            background: `transparent linear-gradient(0deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.main} 100%) 0% 0% no-repeat padding-box`,
+            background: `transparent linear-gradient(0deg, ${gradientColors.primary.start} 0%, ${gradientColors.primary.start} 100%) 0% 0% no-repeat padding-box`,
           },
         }),
         containedSecondary: ({ theme }) => ({
-          background: `transparent linear-gradient(0deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary['100']} 100%) 0% 0% no-repeat padding-box`,
+          background: `transparent linear-gradient(0deg, ${gradientColors.secondary.start} 0%, ${gradientColors.secondary.end} 100%) 0% 0% no-repeat padding-box`,
           ':hover': {
-            background: `transparent linear-gradient(0deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.main} 100%) 0% 0% no-repeat padding-box`,
+            background: `transparent linear-gradient(0deg, ${gradientColors.secondary.start} 0%, ${gradientColors.secondary.start} 100%) 0% 0% no-repeat padding-box`,
           },
         }),
         containedError: ({ theme }) => ({
-          background: `transparent linear-gradient(0deg, ${theme.palette.error.main} 0%, ${theme.palette.error['100']} 100%) 0% 0% no-repeat padding-box`,
+          background: `transparent linear-gradient(0deg, ${gradientColors.error.start} 0%, ${gradientColors.error.end} 100%) 0% 0% no-repeat padding-box`,
           ':hover': {
-            background: `transparent linear-gradient(0deg, ${theme.palette.error.main} 0%, ${theme.palette.error.main} 100%) 0% 0% no-repeat padding-box`,
+            background: `transparent linear-gradient(0deg, ${gradientColors.error.start} 0%, ${gradientColors.error.start} 100%) 0% 0% no-repeat padding-box`,
           },
         }),
         containedWarning: ({ theme }) => ({
-          background: `transparent linear-gradient(0deg, ${theme.palette.warning.main} 0%, ${theme.palette.warning['100']} 100%) 0% 0% no-repeat padding-box`,
+          background: `transparent linear-gradient(0deg, ${gradientColors.warning.start} 0%, ${gradientColors.warning.end} 100%) 0% 0% no-repeat padding-box`,
           ':hover': {
-            background: `transparent linear-gradient(0deg, ${theme.palette.warning.main} 0%, ${theme.palette.warning.main} 100%) 0% 0% no-repeat padding-box`,
+            background: `transparent linear-gradient(0deg, ${gradientColors.warning.start} 0%, ${gradientColors.warning.start} 100%) 0% 0% no-repeat padding-box`,
           },
         }),
         containedInfo: ({ theme }) => ({
-          background: `transparent linear-gradient(0deg, ${theme.palette.info.main} 0%, ${theme.palette.info.main} 100%) 0% 0% no-repeat padding-box`,
+          background: `transparent linear-gradient(0deg, ${gradientColors.info.start} 0%, ${gradientColors.info.start} 100%) 0% 0% no-repeat padding-box`,
           ':hover': {
-            background: `transparent linear-gradient(0deg, ${theme.palette.info['100']} 0%, ${theme.palette.info['100']} 100%) 0% 0% no-repeat padding-box`,
+            background: `transparent linear-gradient(0deg, ${gradientColors.info.end} 0%, ${gradientColors.info.end} 100%) 0% 0% no-repeat padding-box`,
           },
         }),
       },
@@ -185,30 +238,21 @@ export const themes = createTheme({
       default: '#F5F5F5',
     },
     primary: {
-      main: '#F18700',
-      '100': '#F39F33',
+      main: gradientColors.primary.start,
       contrastText: '#fff',
     },
     secondary: {
-      main: '#999999',
-      '400': '#9A9A9A',
-      '100': '#B3B3B3',
+      main: gradientColors.secondary.start,
       contrastText: '#fff',
     },
     error: {
-      main: '#9F041B',
-      '100': '#F5515F',
-      contrastText: '#fff',
+      main: gradientColors.error.start,
     },
     warning: {
-      main: '#028ED5',
-      '100': '#026CA2',
-      contrastText: '#fff',
+      main: gradientColors.warning.start,
     },
     info: {
-      main: '#fff',
-      '100': '#BBBBBB',
-      contrastText: '#000',
+      main: gradientColors.info.start,
     },
   },
   typography: {

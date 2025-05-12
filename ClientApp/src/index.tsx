@@ -6,11 +6,21 @@ import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 
-const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
 const rootElement = document.getElementById('root');
-const root = createRoot(rootElement);
+
+if (!rootElement) {
+    throw new Error("Root element not found");
+}
+
+const root = createRoot(rootElement as HTMLElement);
+
 root.render(
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>
+    <React.StrictMode>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </React.StrictMode>
 );
+
+serviceWorkerRegistration.unregister(); 
+reportWebVitals();

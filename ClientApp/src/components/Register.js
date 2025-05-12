@@ -2,7 +2,6 @@ import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-// Set the base URL for all axios requests
 axios.defaults.baseURL = 'https://localhost:44453';
 
 export default function Register() {
@@ -15,11 +14,9 @@ export default function Register() {
         setLoading(true);
         setError(null);
 
-        // Try lowercase 'auth' instead of 'Auth'
         const apiEndpoint = "/api/Auth/register";
 
         try {
-            // Add console log to debug the request
             console.log("Sending request to:", axios.defaults.baseURL + apiEndpoint);
             console.log("Request data:", form);
 
@@ -33,7 +30,6 @@ export default function Register() {
         } catch (err) {
             console.error("Registration error:", err);
 
-            // Enhanced error handling
             if (err.response?.status === 404) {
                 setError(`Endpoint not found: ${apiEndpoint}. Check your backend API routes.`);
             } else {
