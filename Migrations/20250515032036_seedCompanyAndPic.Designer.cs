@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using binusCareer.ClientApp.Model;
 
@@ -10,9 +11,11 @@ using binusCareer.ClientApp.Model;
 namespace binusCareer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250515032036_seedCompanyAndPic")]
+    partial class seedCompanyAndPic
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,6 +172,9 @@ namespace binusCareer.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CompanyId1")
+                        .HasColumnType("int");
+
                     b.Property<string>("ContactName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -226,6 +232,8 @@ namespace binusCareer.Migrations
 
                     b.HasIndex("CompanyId");
 
+                    b.HasIndex("CompanyId1");
+
                     b.ToTable("PICs");
 
                     b.HasData(
@@ -253,11 +261,15 @@ namespace binusCareer.Migrations
 
             modelBuilder.Entity("binusCareer.ClientApp.Model.PIC", b =>
                 {
-                    b.HasOne("binusCareer.ClientApp.Model.Company", "Company")
+                    b.HasOne("binusCareer.ClientApp.Model.Company", null)
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("binusCareer.ClientApp.Model.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId1");
 
                     b.Navigation("Company");
                 });
