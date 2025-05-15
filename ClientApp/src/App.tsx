@@ -5,6 +5,7 @@ import Register from './components/Register';
 import Welcome from './components/Welcome';
 import Home from './components/Home';
 import Admin from './components/Admin';
+import RegisterPICAndCompany from './components/RegisterPICAndCompany';
 
 const App: React.FC = () => {
     return (
@@ -14,6 +15,8 @@ const App: React.FC = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/registerPICAndCompany" element={<RegisterPICAndCompany />} />
+
         </Routes>
     );
 };

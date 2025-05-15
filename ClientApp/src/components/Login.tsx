@@ -33,7 +33,7 @@ export default function Login() {
             if (user.isAdmin) {
                 navigate("/admin");
             } else {
-                navigate("/home");
+                navigate("/registerPICAndCompany");
             }
         } catch (err: any) {
             alert("Login failed: " + (err.response?.data || err.message));
