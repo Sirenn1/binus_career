@@ -1,5 +1,24 @@
 import React, { useState } from 'react';
 import { PICData } from './RegisterPICAndCompany';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Divider,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  TextField,
+  Typography
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 interface Props {
   onNext: (data: PICData) => void;
@@ -21,6 +40,11 @@ const PICFormStep: React.FC<Props> = ({ onNext }) => {
   const [line, setLine] = useState('');
   const [linkedIn, setLinkedIn] = useState('');
   const [instagram, setInstagram] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,171 +68,256 @@ const PICFormStep: React.FC<Props> = ({ onNext }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Contact Name *</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Contact Name"
-          value={contactName}
-          onChange={e => setContactName(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Email *</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Phone Number *</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Phone Number"
-          value={phoneNumber}
-          onChange={e => setPhoneNumber(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Mobile Phone Number *</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Mobile Phone Number"
-          value={mobilePhoneNumber}
-          onChange={e => setMobilePhoneNumber(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Password *</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Manage In</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Manage In"
-          value={manageIn}
-          onChange={e => setManageIn(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Position Level</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Position Level"
-          value={positionLevel}
-          onChange={e => setPositionLevel(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Job Position</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Job Position"
-          value={jobPosition}
-          onChange={e => setJobPosition(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Job Title</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Job Title"
-          value={jobTitle}
-          onChange={e => setJobTitle(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Salutation</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Salutation"
-          value={salutation}
-          onChange={e => setSalutation(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Office Extension</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Office Extension"
-          value={officeExt}
-          onChange={e => setOfficeExt(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">WhatsApp</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="WhatsApp"
-          value={whatsapp}
-          onChange={e => setWhatsapp(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Line</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Line"
-          value={line}
-          onChange={e => setLine(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="LinkedIn"
-          value={linkedIn}
-          onChange={e => setLinkedIn(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Instagram</label>
-        <input
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Instagram"
-          value={instagram}
-          onChange={e => setInstagram(e.target.value)}
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-      >
-        Next: Company Info
-      </button>
-    </form>
+    <Box
+      sx={{
+        width: '100%',
+        backgroundColor: '#f5f5f5',
+        padding: { xs: '16px', md: '24px' },
+        minHeight: '100vh'
+      }}
+    >
+      <Container maxWidth="md">
+        <Card elevation={3} sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+          <Box 
+            sx={{ 
+              backgroundColor: '#028ed5', 
+              padding: '16px 24px',
+              color: 'white'
+            }}
+          >
+            <Typography variant="h5" fontWeight="bold">
+              PIC Information
+            </Typography>
+          </Box>
+          
+          <CardContent>
+            <form onSubmit={handleSubmit}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', margin: '-12px' }}>
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Contact Name*"
+                    variant="outlined"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Email*"
+                    variant="outlined"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Phone Number*"
+                    variant="outlined"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Mobile Phone Number*"
+                    variant="outlined"
+                    value={mobilePhoneNumber}
+                    onChange={(e) => setMobilePhoneNumber(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel htmlFor="password">Password*</InputLabel>
+                    <OutlinedInput
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password*"
+                    />
+                  </FormControl>
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="manage-in-label">Manage In</InputLabel>
+                    <Select
+                      labelId="manage-in-label"
+                      value={manageIn}
+                      onChange={(e) => setManageIn(e.target.value)}
+                      label="Manage In"
+                    >
+                      <MenuItem value="Department">Department</MenuItem>
+                      <MenuItem value="Team">Team</MenuItem>
+                      <MenuItem value="Branch">Branch</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="position-level-label">Position Level</InputLabel>
+                    <Select
+                      labelId="position-level-label"
+                      value={positionLevel}
+                      onChange={(e) => setPositionLevel(e.target.value)}
+                      label="Position Level"
+                    >
+                      <MenuItem value="Entry">Entry Level</MenuItem>
+                      <MenuItem value="Middle">Middle Management</MenuItem>
+                      <MenuItem value="Senior">Senior Management</MenuItem>
+                      <MenuItem value="Executive">Executive</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="job-position-label">Job Position</InputLabel>
+                    <Select
+                      labelId="job-position-label"
+                      value={jobPosition}
+                      onChange={(e) => setJobPosition(e.target.value)}
+                      label="Job Position"
+                    >
+                      <MenuItem value="Manager">Manager</MenuItem>
+                      <MenuItem value="Supervisor">Supervisor</MenuItem>
+                      <MenuItem value="Staff">Staff</MenuItem>
+                      <MenuItem value="Director">Director</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Job Title"
+                    variant="outlined"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="salutation-label">Salutation</InputLabel>
+                    <Select
+                      labelId="salutation-label"
+                      value={salutation}
+                      onChange={(e) => setSalutation(e.target.value)}
+                      label="Salutation"
+                    >
+                      <MenuItem value="Mr">Mr.</MenuItem>
+                      <MenuItem value="Mrs">Mrs.</MenuItem>
+                      <MenuItem value="Ms">Ms.</MenuItem>
+                      <MenuItem value="Dr">Dr.</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                
+                <div style={{ width: '100%', padding: '12px', boxSizing: 'border-box' }}>
+                  <Divider sx={{ my: 2 }}>
+                    <Typography variant="body2" color="textSecondary">
+                      Additional Contact Information
+                    </Typography>
+                  </Divider>
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Office Extension"
+                    variant="outlined"
+                    value={officeExt}
+                    onChange={(e) => setOfficeExt(e.target.value)}
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="WhatsApp"
+                    variant="outlined"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Line"
+                    variant="outlined"
+                    value={line}
+                    onChange={(e) => setLine(e.target.value)}
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="LinkedIn"
+                    variant="outlined"
+                    value={linkedIn}
+                    onChange={(e) => setLinkedIn(e.target.value)}
+                  />
+                </div>
+                
+                <div style={{ width: '50%', padding: '12px', boxSizing: 'border-box' }}>
+                  <TextField
+                    fullWidth
+                    label="Instagram"
+                    variant="outlined"
+                    value={instagram}
+                    onChange={(e) => setInstagram(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{ 
+                    bgcolor: '#f48d0c', 
+                    '&:hover': { bgcolor: '#d87d0a' },
+                    borderRadius: '4px',
+                    px: 5
+                  }}
+                >
+                  Next
+                </Button>
+              </Box>
+            </form>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   );
 };
 

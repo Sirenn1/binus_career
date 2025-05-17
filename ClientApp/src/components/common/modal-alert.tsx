@@ -142,8 +142,14 @@ export function ModalAlert({
           )}
           <Button
             variant="contained"
-            color={content[variant].color}
-            sx={modalAlertStyle.modalAlertButton}
+            sx={{
+              ...modalAlertStyle.modalAlertButton,
+              backgroundColor: '#f48d0c',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#d87d0a'
+              }
+            }}
             onClick={handleOk}
           >
             {buttonTitle || 'Ok'}
