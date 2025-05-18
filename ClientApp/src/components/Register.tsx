@@ -1,26 +1,29 @@
 import { useState, FormEvent } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
   Card,
   CardContent,
   Container,
-  Divider,
   Stack,
   TextField,
   Typography,
-  CircularProgress,
   InputAdornment,
   IconButton,
-  Alert,
-  Slide
+  CircularProgress
 } from "@mui/material";
-import { Visibility, VisibilityOff, Person, Email, Lock } from "@mui/icons-material";
+import {
+  Visibility,
+  VisibilityOff,
+  Person,
+  Email,
+  Lock
+} from "@mui/icons-material";
 import { ModalAlert } from "./common/modal-alert";
 
-axios.defaults.baseURL = 'https://localhost:44453';
+axios.defaults.baseURL = "https://localhost:44453";
 
 interface RegisterForm {
   username: string;
@@ -28,58 +31,43 @@ interface RegisterForm {
   password: string;
 }
 
-interface RegisterResponse {
-  message: string;
-  success: boolean;
-}
-
-export default function Register() {
-  const [form, setForm] = useState<RegisterForm>({ username: "", email: "", password: "" });
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string>("");
+export default function RegisterPage() {
+  const [form, setForm] = useState<RegisterForm>({
+    username: "",
+    email: "",
+    password: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-
-    const apiEndpoint = "/api/Auth/register";
 
     try {
-      console.log("Sending request to:", axios.defaults.baseURL + apiEndpoint);
-      console.log("Request data:", form);
-
-      const res = await axios.post<RegisterResponse>(apiEndpoint, form, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      setSuccessMessage(res.data.message || "Registration successful! Your account is pending approval.");
+      const res = await axios.post("/api/Auth/register", form);
+      setSuccessMessage(res.data?.message || "Registration successful!");
       setShowSuccessModal(true);
     } catch (err: any) {
-      console.error("Registration error:", err);
-
-      if (err.response?.status === 404) {
-        setError(`Endpoint not found: ${apiEndpoint}. Check your backend API routes.`);
-      } else {
-        const errorMsg = err.response?.data?.message ||
-          err.response?.data ||
-          err.message ||
-          "Registration failed";
-
-        setError(errorMsg);
-      }
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data ||
+        err?.message ||
+        "Registration failed";
+      setErrorMessage(msg);
+      setShowErrorModal(true);
     } finally {
       setLoading(false);
     }
   };
 
   const handlePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -89,144 +77,118 @@ export default function Register() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundImage: "linear-gradient(180deg, #028ed5, #014365)",
-        padding: { xs: "20px", md: "40px" }
+        background: "#ffffff",
+        padding: "20px"
       }}
     >
-      <Container maxWidth="sm">
-        <Card elevation={5} sx={{ borderRadius: "12px", overflow: "hidden" }}>
-          <CardContent sx={{ p: 0 }}>
-            <Box sx={{ p: 4, textAlign: "center" }}>
-              <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
-                Create Account
+      <Container maxWidth="xs">
+        <Card elevation={3} sx={{ borderRadius: "16px", px: 3, py: 4 }}>
+          <Box sx={{ display: "flex", alignItems: "center", mb: 4 }}>
+            <img src="/assets/logo/logo-binusuniv-binusmaya.svg" style={{ height: 50 }} />
+          </Box>
+
+          <form onSubmit={handleSubmit}>
+            <Stack spacing={3}>
+              <TextField
+                fullWidth
+                label="Name"
+                variant="outlined"
+                required
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Person color="action" />
+                    </InputAdornment>
+                  )
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                type="email"
+                required
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Email color="action" />
+                    </InputAdornment>
+                  )
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label="Password"
+                variant="outlined"
+                type={showPassword ? "text" : "password"}
+                required
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock color="action" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handlePasswordVisibility} edge="end">
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth
+                disabled={loading}
+                sx={{ py: 1.5, fontWeight: 600, fontSize: "16px" }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "REGISTER"}
+              </Button>
+
+              <Typography variant="body2" align="center">
+                Already have an account?{" "}
+                <a href="/login" style={{ color: "#1976d2", textDecoration: "none", fontWeight: 500 }}>
+                  Sign in here
+                </a>
               </Typography>
-              <Typography variant="body1" color="textSecondary" mb={3}>
-                Sign up to join BINUS Career
-              </Typography>
-
-              {error && (
-                <Slide direction="down" in={!!error} mountOnEnter unmountOnExit>
-                  <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
-                    {error}
-                  </Alert>
-                </Slide>
-              )}
-
-              <form onSubmit={handleSubmit}>
-                <Stack spacing={3}>
-                  <TextField
-                    fullWidth
-                    label="Username"
-                    variant="outlined"
-                    required
-                    value={form.username}
-                    onChange={(e) => setForm({ ...form, username: e.target.value })}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Person color="action" />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    variant="outlined"
-                    required
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Email color="action" />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  
-                  <TextField
-                    fullWidth
-                    label="Password"
-                    variant="outlined"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Lock color="action" />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={handlePasswordVisibility} edge="end">
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    fullWidth
-                    disabled={loading}
-                    sx={{ 
-                      py: 1.5, 
-                      textTransform: "none", 
-                      fontSize: "16px",
-                      fontWeight: 600 
-                    }}
-                  >
-                    {loading ? <CircularProgress size={24} color="inherit" /> : "Register"}
-                  </Button>
-                </Stack>
-              </form>
-
-              <Divider sx={{ my: 3 }}>
-                <Typography variant="body2" color="textSecondary">
-                  OR
-                </Typography>
-              </Divider>
-
-              <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
-                <Typography variant="body2">
-                  Already have an account?
-                </Typography>
-                <Button
-                  component={Link}
-                  to="/login"
-                  variant="outlined"
-                  color="primary"
-                  sx={{ textTransform: "none" }}
-                >
-                  Sign In
-                </Button>
-              </Stack>
-            </Box>
-          </CardContent>
+            </Stack>
+          </form>
         </Card>
-      </Container>
 
-      {/* Success Modal */}
-      <ModalAlert
-        variant="success"
-        open={showSuccessModal}
-        title="Registration Successful"
-        message={successMessage}
-        buttonTitle="Go to Login"
-        onClose={() => {
-          setShowSuccessModal(false);
-          window.location.href = "/login";
-        }}
-      />
+        <ModalAlert
+          variant="success"
+          open={showSuccessModal}
+          title="Registration Successful"
+          message={successMessage}
+          buttonTitle="OK"
+          onClose={() => {
+            setShowSuccessModal(false);
+            navigate("/login");
+          }}
+        />
+
+        <ModalAlert
+          variant="failed"
+          open={showErrorModal}
+          title="Registration Failed"
+          message={errorMessage}
+          buttonTitle="OK"
+          onClose={() => setShowErrorModal(false)}
+        />
+      </Container>
     </Box>
   );
-} 
+}

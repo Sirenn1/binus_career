@@ -1,4 +1,5 @@
-import { ButtonProps, LoadingButton } from '@mui/lab';
+import { LoadingButton } from '@mui/lab';
+import { Button, ButtonProps } from '@mui/material';
 import { cloneElement, ReactElement } from 'react';
 
 export default function CustomLoadingButton({
