@@ -34,6 +34,16 @@ const Admin: React.FC = () => {
     }
   };
 
+  const rejectUser = async (id: number) => {
+    try {
+      await axios.put(`/api/users/${id}/reject`);
+      // Remove the user from the list after rejection
+      setUsers((prevUsers) => prevUsers.filter(user => user.id !== id));
+    } catch (error) {
+      console.error('Error rejecting user:', error);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -60,7 +70,15 @@ const Admin: React.FC = () => {
               <td>{isApproved ? 'Yes' : 'No'}</td>
               <td>
                 {!isApproved && (
-                  <button onClick={() => approveUser(id)}>Approve</button>
+                  <>
+                    <button onClick={() => approveUser(id)}>Approve</button>
+                    <button 
+                      onClick={() => rejectUser(id)}
+                      style={{ marginLeft: '8px', backgroundColor: '#f44336', color: 'white' }}
+                    >
+                      Reject
+                    </button>
+                  </>
                 )}
               </td>
             </tr>

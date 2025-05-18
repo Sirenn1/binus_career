@@ -33,4 +33,20 @@ public class UsersController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPut("{id}/reject")]
+    public async Task<IActionResult> RejectUser(int id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        // Delete the user instead of just marking as not approved
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
 }
