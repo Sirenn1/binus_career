@@ -7,15 +7,19 @@ import Register from './components/Register';
 import Welcome from './components/Welcome';
 import Admin from './components/Admin';
 import RegisterPICAndCompany from './components/RegisterPICAndCompany';
+import PICForm from './components/Contact';
+import CompanyForm from './components/Company';
+import ContactForm from './components/Contact';
+import Form from './components/Form';
 
 // Create a theme instance
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#028ed5', // BINUS blue
+      main: '#028ed5', 
     },
     secondary: {
-      main: '#f48d0c', // BINUS orange
+      main: '#f48d0c', 
     },
   },
 });
@@ -30,6 +34,9 @@ const App: React.FC = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/registerPICAndCompany" element={<RegisterPICAndCompany />} />
+                <Route path="/Contact" element={<ContactForm />} />
+                <Route path="/Company" element={<CompanyForm />} />
+                <Route path="/Form" element={<Form />} />
             </Routes>
         </ThemeProvider>
     );
