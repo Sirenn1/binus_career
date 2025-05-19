@@ -102,11 +102,28 @@ const CompanyFormStep: React.FC<Props> = ({ picData }) => {
 
       const companyId = companyRes.data.id;
 
+      // Map picData keys to match backend expectations
+      const picDataForApi = {
+        contactName: picData.contactName,
+        email: picData.email,
+        phoneNumber: picData.phoneNumber,
+        mobilePhoneNumber: picData.mobilePhoneNumber,
+        password: picData.password,
+        manageIn: picData.manageIn || "",
+        positionLevel: picData.positionLevel || "",
+        jobPosition: picData.jobPosition || "",
+        jobTitle: picData.jobTitle || "",
+        salutation: picData.salutation || "",
+        officeExt: picData.officeExt || "",
+        whatsapp: picData.whatsapp || "",
+        line: picData.line || "",
+        linkedIn: picData.linkedIn || "",
+        instagram: picData.instagram || "",
+        companyId: companyId
+      };
+
       // Submit PIC data
-      await axios.post('/api/pic', {
-        ...picData,
-        companyId,
-      });
+      await axios.post('/api/pic', picDataForApi);
 
       alert('PIC and Company registered successfully!');
     } catch (err) {

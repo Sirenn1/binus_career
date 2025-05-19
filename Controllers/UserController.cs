@@ -43,7 +43,6 @@ public class UsersController : ControllerBase
             return NotFound();
         }
 
-        // Delete the user instead of just marking as not approved
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
 
