@@ -34,6 +34,7 @@ const Form = () => {
   });
 
   const [companyData, setCompanyData] = useState({
+    id: null as number | null,
     companyName: '',
     companyAccountUsername: '',
     companyAddress: '',
@@ -78,16 +79,16 @@ const Form = () => {
 
   const validateCompanyData = () => {
     if (!companyData.companyName) return 'Company name is required';
-    if (!companyData.companyAccountUsername) return 'Company account username is required';
-    if (!companyData.companyEmail) return 'Company email is required';
-    if (!/\S+@\S+\.\S+/.test(companyData.companyEmail)) return 'Invalid company email format';
-    if (!companyData.phoneNumber) return 'Company phone number is required';
-    if (!companyData.companyAddress) return 'Company address is required';
-    if (!companyData.country) return 'Country is required';
-    if (!companyData.province) return 'Province is required';
-    if (!companyData.city) return 'City is required';
-    if (!companyData.postalCode) return 'Postal code is required';
-    if (!companyData.companyType) return 'Company type is required';
+    if (!companyData.id && !companyData.companyAccountUsername) return 'Company account username is required';
+    if (!companyData.id && !companyData.companyEmail) return 'Company email is required';
+    if (!companyData.id && companyData.companyEmail && !/\S+@\S+\.\S+/.test(companyData.companyEmail)) return 'Invalid company email format';
+    if (!companyData.id && !companyData.phoneNumber) return 'Company phone number is required';
+    if (!companyData.id && !companyData.companyAddress) return 'Company address is required';
+    if (!companyData.id && !companyData.country) return 'Country is required';
+    if (!companyData.id && !companyData.province) return 'Province is required';
+    if (!companyData.id && !companyData.city) return 'City is required';
+    if (!companyData.id && !companyData.postalCode) return 'Postal code is required';
+    if (!companyData.id && !companyData.companyType) return 'Company type is required';
     return null;
   };
 
@@ -115,46 +116,57 @@ const Form = () => {
 
     setLoading(true);
     try {
-      // First create company
-      const companyFormData = new FormData();
-      const hasCompanyLogo = companyData.companyLogo !== null;
+      let companyId = companyData.id;
       
-      // Log company data before submission
-      console.log('Company data before submission:', {
-        ...companyData,
-        companyLogo: companyData.companyLogo ? {
-          name: companyData.companyLogo.name,
-          type: companyData.companyLogo.type,
-          size: companyData.companyLogo.size
-        } : null
-      });
+      // Only create a new company if we don't have an existing company ID
+      if (!companyId) {
+        // Create new company
+        const companyFormData = new FormData();
+        const hasCompanyLogo = companyData.companyLogo !== null;
+        
+        // Log company data before submission
+        console.log('Company data before submission:', {
+          ...companyData,
+          companyLogo: companyData.companyLogo ? {
+            name: companyData.companyLogo.name,
+            type: companyData.companyLogo.type,
+            size: companyData.companyLogo.size
+          } : null
+        });
 
-      Object.entries(companyData).forEach(([key, value]) => {
-        if (value !== null) {
-          companyFormData.append(key, value);
-        }
-      });
+        Object.entries(companyData).forEach(([key, value]) => {
+          if (key !== 'id' && value !== null) {
+            companyFormData.append(key, String(value));
+          }
+        });
 
-      // Log FormData contents
-      console.log('Company FormData contents:');
-      Array.from(companyFormData.entries()).forEach(([key, value]) => {
-        console.log(`${key}:`, value instanceof File ? {
-          name: value.name,
-          type: value.type,
-          size: value.size
-        } : value);
-      });
+        // Log FormData contents
+        console.log('Company FormData contents:');
+        Array.from(companyFormData.entries()).forEach(([key, value]) => {
+          console.log(`${key}:`, value instanceof File ? {
+            name: value.name,
+            type: value.type,
+            size: value.size
+          } : value);
+        });
 
-      const companyRes = await axios.post('/api/company', companyFormData, {
-        headers: hasCompanyLogo ? {
-          'Content-Type': 'multipart/form-data'
-        } : {}
-      });
-      console.log('Company response:', companyRes.data);
-      
-      const companyId = companyRes.data.id;
+        const companyRes = await axios.post('/api/company', companyFormData, {
+          headers: hasCompanyLogo ? {
+            'Content-Type': 'multipart/form-data'
+          } : {}
+        });
+        console.log('Company response:', companyRes.data);
+        
+        companyId = companyRes.data.id;
+      } else {
+        console.log('Using existing company with ID:', companyId);
+      }
 
       // Then create PIC with company ID
+      if (!companyId) {
+        throw new Error('Failed to get or create company ID');
+      }
+      
       const picFormData = new FormData();
       const hasNameCard = picData.nameCard !== null;
       
@@ -171,11 +183,11 @@ const Form = () => {
       // Add all PIC data except the nameCard
       Object.entries(picData).forEach(([key, value]) => {
         if (key !== 'nameCard' && value !== null) {
-          picFormData.append(key, value);
+          picFormData.append(key, String(value));
         }
       });
 
-      // Add companyId
+      // Add companyId 
       picFormData.append('companyId', companyId.toString());
 
       // Add nameCard file if it exists

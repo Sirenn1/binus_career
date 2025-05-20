@@ -14,9 +14,34 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+interface CompanyData {
+  id?: number;
+  companyName: string;
+  companyAccountUsername?: string;
+  companyAddress?: string;
+  country?: string;
+  postalCode?: string;
+  companyEmail?: string;
+  phoneNumber?: string;
+  companyType?: string;
+  abbreviation?: string;
+  province?: string;
+  city?: string;
+  businessType?: string;
+  fax?: string;
+  websiteAddress?: string;
+  facebook?: string;
+  instagram?: string;
+  linkedIn?: string;
+  twitter?: string;
+  line?: string;
+  bippMemberType?: string;
+}
+
 interface Props {
   onDataChange: (data: any) => void;
   data: {
+    id?: number | null;
     companyName: string;
     companyAccountUsername: string;
     companyAddress: string;
@@ -42,9 +67,10 @@ interface Props {
 }
 
 const Company: React.FC<Props> = ({ onDataChange, data }) => {
-  const [companies, setCompanies] = useState<{ companyName: string }[]>([]);
+  const [companies, setCompanies] = useState<CompanyData[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [isExistingCompany, setIsExistingCompany] = useState(false);
 
   useEffect(() => {
     const searchCompanies = async () => {
@@ -53,6 +79,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
       setLoading(true);
       try {
         const response = await axios.get(`/api/company/search?name=${encodeURIComponent(inputValue)}`);
+        console.log('API Response:', response.data);
         setCompanies(response.data);
       } catch (error) {
         console.error('Error searching companies:', error);
@@ -79,6 +106,35 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
     }
   };
 
+  const handleCompanySelect = (newValue: string | null) => {
+    if (!newValue) {
+      // Clear selection
+      setIsExistingCompany(false);
+      onDataChange({ companyName: '', id: null });
+      return;
+    }
+    
+    const selectedCompany = companies.find(c => c.companyName === newValue);
+    
+    if (selectedCompany) {
+      // It's an existing company from the search
+      setIsExistingCompany(true);
+      
+      // Update all company fields with data from API including the ID
+      const updatedData = {...selectedCompany};
+      
+      console.log('Selected existing company:', selectedCompany);
+      onDataChange(updatedData);
+    } else {
+      // It's a new company name entered by user
+      setIsExistingCompany(false);
+      onDataChange({ companyName: newValue, id: null });
+    }
+  };
+
+  // Helper function to determine if a field should be disabled
+  const isFieldDisabled = () => isExistingCompany;
+
   return (
     <Box p={4}>
       <Grid container spacing={3}>
@@ -87,7 +143,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
             <Autocomplete
               value={data.companyName}
               onChange={(_, newValue) => {
-                onDataChange({ companyName: newValue || '' });
+                handleCompanySelect(newValue);
               }}
               inputValue={inputValue}
               onInputChange={(_, newInputValue) => {
@@ -126,6 +182,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.companyAccountUsername}
               onChange={handleChange('companyAccountUsername')}
               required
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -136,6 +193,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               label="Aliases/Abbr"
               value={data.abbreviation}
               onChange={handleChange('abbreviation')}
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -149,6 +207,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               required
               multiline
               rows={3}
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -161,6 +220,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('country')}
               label="Country*"
               required
+              disabled={isFieldDisabled()}
             >
               <MenuItem value="Indonesia">Indonesia</MenuItem>
               <MenuItem value="Singapore">Singapore</MenuItem>
@@ -177,6 +237,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('province')}
               label="Province*"
               required
+              disabled={isFieldDisabled()}
             >
               <MenuItem value="DKI Jakarta">DKI Jakarta</MenuItem>
               <MenuItem value="West Java">West Java</MenuItem>
@@ -193,6 +254,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('city')}
               label="City*"
               required
+              disabled={isFieldDisabled()}
             >
               <MenuItem value="Jakarta">Jakarta</MenuItem>
               <MenuItem value="Bandung">Bandung</MenuItem>
@@ -208,6 +270,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.postalCode}
               onChange={handleChange('postalCode')}
               required
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -220,6 +283,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('businessType')}
               label="Business Type*"
               required
+              disabled={isFieldDisabled()}
             >
               <MenuItem value="IT">IT</MenuItem>
               <MenuItem value="Finance">Finance</MenuItem>
@@ -237,6 +301,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.companyEmail}
               onChange={handleChange('companyEmail')}
               required
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -248,6 +313,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.phoneNumber}
               onChange={handleChange('phoneNumber')}
               required
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -258,6 +324,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               label="Fax"
               value={data.fax}
               onChange={handleChange('fax')}
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -268,6 +335,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               label="Website Address"
               value={data.websiteAddress}
               onChange={handleChange('websiteAddress')}
+              disabled={isFieldDisabled()}
             />
           </FormControl>
         </Grid>
@@ -279,6 +347,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
                 label={platform.charAt(0).toUpperCase() + platform.slice(1)}
                 value={data[platform as keyof typeof data]}
                 onChange={handleChange(platform)}
+                disabled={isFieldDisabled()}
               />
             </FormControl>
           </Grid>
@@ -292,6 +361,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('bippMemberType')}
               label="BEP Member Type*"
               required
+              disabled={isFieldDisabled()}
             >
               <MenuItem value="Gold">Gold</MenuItem>
               <MenuItem value="Silver">Silver</MenuItem>
@@ -308,6 +378,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('companyType')}
               label="Company Type*"
               required
+              disabled={isFieldDisabled()}
             >
               <MenuItem value="Corp">Corporation</MenuItem>
               <MenuItem value="LLC">LLC</MenuItem>
@@ -328,6 +399,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               inputProps={{
                 accept: '.jpg,.jpeg,.png'
               }}
+              disabled={isFieldDisabled()}
             />
             <Typography variant="caption" color="error">
               *Maximum File Size 2MB
