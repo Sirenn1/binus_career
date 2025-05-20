@@ -55,13 +55,11 @@ public class CompanyController : ControllerBase
         if (string.IsNullOrEmpty(company.PostalCode))
             return BadRequest("Postal code is required");
 
-        // Check if company username already exists
         var existingCompany = await _context.Companies
             .FirstOrDefaultAsync(c => c.CompanyAccountUsername == company.CompanyAccountUsername);
         if (existingCompany != null)
             return BadRequest("Company account username already exists");
 
-        // Handle company logo upload
         if (companyLogo != null)
         {
             if (companyLogo.Length > 2 * 1024 * 1024) // 2MB limit
@@ -100,7 +98,6 @@ public class CompanyController : ControllerBase
         var existingCompany = await _context.Companies.FindAsync(id);
         if (existingCompany == null) return NotFound();
 
-        // Validate required fields
         if (string.IsNullOrEmpty(company.CompanyName))
             return BadRequest("Company name is required");
         if (string.IsNullOrEmpty(company.CompanyEmail))
@@ -136,5 +133,16 @@ public class CompanyController : ControllerBase
         _context.Companies.Remove(company);
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<Company>>> SearchCompanies([FromQuery] string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return await _context.Companies.ToListAsync();
+
+        return await _context.Companies
+            .Where(c => c.CompanyName.Contains(name))
+            .ToListAsync();
     }
 }

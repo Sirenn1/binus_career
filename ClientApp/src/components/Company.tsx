@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   TextField,
@@ -9,7 +9,10 @@ import {
   Typography,
   Box,
   SelectChangeEvent,
+  Autocomplete,
+  CircularProgress,
 } from '@mui/material';
+import axios from 'axios';
 
 interface Props {
   onDataChange: (data: any) => void;
@@ -39,6 +42,29 @@ interface Props {
 }
 
 const Company: React.FC<Props> = ({ onDataChange, data }) => {
+  const [companies, setCompanies] = useState<{ companyName: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+
+  useEffect(() => {
+    const searchCompanies = async () => {
+      if (inputValue.length < 2) return;
+      
+      setLoading(true);
+      try {
+        const response = await axios.get(`/api/company/search?name=${encodeURIComponent(inputValue)}`);
+        setCompanies(response.data);
+      } catch (error) {
+        console.error('Error searching companies:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timeoutId = setTimeout(searchCompanies, 300);
+    return () => clearTimeout(timeoutId);
+  }, [inputValue]);
+
   const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     onDataChange({ [field]: event.target.value });
   };
@@ -58,11 +84,37 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <FormControl fullWidth>
-            <TextField
-              label="Company Name"
+            <Autocomplete
               value={data.companyName}
-              onChange={handleChange('companyName')}
-              required
+              onChange={(_, newValue) => {
+                onDataChange({ companyName: newValue || '' });
+              }}
+              inputValue={inputValue}
+              onInputChange={(_, newInputValue) => {
+                setInputValue(newInputValue);
+              }}
+              options={companies.map(company => company.companyName)}
+              loading={loading}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Company Name"
+                  required
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+              freeSolo
+              autoComplete
+              includeInputInList
+              filterOptions={(x) => x}
             />
           </FormControl>
         </Grid>
