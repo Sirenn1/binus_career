@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using binusCareer.ClientApp.Model;
+using System.ComponentModel.DataAnnotations;
+using BCrypt.Net;
 
 namespace binusCareer.Controllers
 {
@@ -11,48 +13,85 @@ namespace binusCareer.Controllers
     public class PICController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _environment;
 
-        public PICController(AppDbContext context)
+        public PICController(AppDbContext context, IWebHostEnvironment environment)
         {
             _context = context;
+            _environment = environment;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PIC>>> GetPICs()
         {
-            return await _context.PICs.ToListAsync();
+            return await _context.PICs.Include(p => p.Company).ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<PIC>> GetPIC(int id)
         {
-            var pic = await _context.PICs.FindAsync(id);
+            var pic = await _context.PICs.Include(p => p.Company).FirstOrDefaultAsync(p => p.Id == id);
             if (pic == null) return NotFound();
             return pic;
         }
 
         [HttpPost]
-        public async Task<ActionResult<PIC>> PostPIC(PICDto picDto)
+        public async Task<ActionResult<PIC>> PostPIC([FromForm] PIC pic, IFormFile? nameCard)
         {
-            var pic = new PIC
+            // Validate required fields
+            if (string.IsNullOrEmpty(pic.ContactName))
+                return BadRequest("Contact name is required");
+            if (string.IsNullOrEmpty(pic.Email))
+                return BadRequest("Email is required");
+            if (!new EmailAddressAttribute().IsValid(pic.Email))
+                return BadRequest("Invalid email format");
+            if (string.IsNullOrEmpty(pic.PhoneNumber))
+                return BadRequest("Phone number is required");
+            if (string.IsNullOrEmpty(pic.MobilePhoneNumber))
+                return BadRequest("Mobile phone number is required");
+            if (string.IsNullOrEmpty(pic.Password))
+                return BadRequest("Password is required");
+            if (pic.Password.Length < 8)
+                return BadRequest("Password must be at least 8 characters long");
+
+            // Check if email already exists
+            var existingPIC = await _context.PICs.FirstOrDefaultAsync(p => p.Email == pic.Email);
+            if (existingPIC != null)
+                return BadRequest("Email already registered");
+
+            // Check if company exists
+            var company = await _context.Companies.FindAsync(pic.CompanyId);
+            if (company == null)
+                return BadRequest("Company not found");
+
+            // Handle name card upload
+            if (nameCard != null)
             {
-                ContactName = picDto.ContactName,
-                Email = picDto.Email,
-                PhoneNumber = picDto.PhoneNumber,
-                MobilePhoneNumber = picDto.MobilePhoneNumber,
-                ManageIn = picDto.ManageIn,
-                PositionLevel = picDto.PositionLevel,
-                JobPosition = picDto.JobPosition,
-                JobTitle = picDto.JobTitle,
-                Salutation = picDto.Salutation,
-                OfficeExt = picDto.OfficeExt,
-                Whatsapp = picDto.Whatsapp,
-                Line = picDto.Line,
-                LinkedIn = picDto.LinkedIn,
-                Instagram = picDto.Instagram,
-                Password = BCrypt.Net.BCrypt.HashPassword(picDto.Password),
-                CompanyId = picDto.CompanyId
-            };
+                if (nameCard.Length > 2 * 1024 * 1024) // 2MB limit
+                    return BadRequest("Name card size should not exceed 2MB");
+
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+                var extension = Path.GetExtension(nameCard.FileName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(extension))
+                    return BadRequest("Only .jpg, .jpeg, .png, and .pdf files are allowed");
+
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "name-cards");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await nameCard.CopyToAsync(stream);
+                }
+
+                pic.NameCardPath = $"/uploads/name-cards/{uniqueFileName}";
+            }
+
+            // Hash password
+            pic.Password = BCrypt.Net.BCrypt.HashPassword(pic.Password);
 
             _context.PICs.Add(pic);
             await _context.SaveChangesAsync();
@@ -63,7 +102,43 @@ namespace binusCareer.Controllers
         public async Task<IActionResult> PutPIC(int id, PIC pic)
         {
             if (id != pic.Id) return BadRequest();
-            _context.Entry(pic).State = EntityState.Modified;
+
+            var existingPIC = await _context.PICs.FindAsync(id);
+            if (existingPIC == null) return NotFound();
+
+            // Validate required fields
+            if (string.IsNullOrEmpty(pic.ContactName))
+                return BadRequest("Contact name is required");
+            if (string.IsNullOrEmpty(pic.Email))
+                return BadRequest("Email is required");
+            if (!new EmailAddressAttribute().IsValid(pic.Email))
+                return BadRequest("Invalid email format");
+            if (string.IsNullOrEmpty(pic.PhoneNumber))
+                return BadRequest("Phone number is required");
+            if (string.IsNullOrEmpty(pic.MobilePhoneNumber))
+                return BadRequest("Mobile phone number is required");
+
+            // Check if email is being changed and if it already exists
+            if (pic.Email != existingPIC.Email)
+            {
+                var emailExists = await _context.PICs.AnyAsync(p => p.Email == pic.Email);
+                if (emailExists)
+                    return BadRequest("Email already registered");
+            }
+
+            // Update password only if it's being changed
+            if (!string.IsNullOrEmpty(pic.Password) && pic.Password != existingPIC.Password)
+            {
+                if (pic.Password.Length < 8)
+                    return BadRequest("Password must be at least 8 characters long");
+                pic.Password = BCrypt.Net.BCrypt.HashPassword(pic.Password);
+            }
+            else
+            {
+                pic.Password = existingPIC.Password;
+            }
+
+            _context.Entry(existingPIC).CurrentValues.SetValues(pic);
             await _context.SaveChangesAsync();
             return NoContent();
         }
@@ -73,6 +148,17 @@ namespace binusCareer.Controllers
         {
             var pic = await _context.PICs.FindAsync(id);
             if (pic == null) return NotFound();
+
+            // Delete name card if exists
+            if (!string.IsNullOrEmpty(pic.NameCardPath))
+            {
+                var filePath = Path.Combine(_environment.WebRootPath, pic.NameCardPath.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+            }
+
             _context.PICs.Remove(pic);
             await _context.SaveChangesAsync();
             return NoContent();

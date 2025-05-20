@@ -40,7 +40,7 @@ export default function Login() {
                 return;
             }
 
-            user.isAdmin ? navigate("/admin") : navigate("/registerPICAndCompany");
+            user.isAdmin ? navigate("/admin") : navigate("/Form");
         } catch (err: any) {
             setErrorMessage("Login failed: " + (err.response?.data || err.message));
             setShowErrorModal(true);

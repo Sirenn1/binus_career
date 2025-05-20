@@ -4,7 +4,7 @@ using binusCareer.ClientApp.Model;
 using System.Text.Json;
 
 [ApiController]
-[Route("api/[controller]")]  // This becomes api/Auth because of the controller name
+[Route("api/[controller]")]  
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -14,7 +14,6 @@ public class AuthController : ControllerBase
         _context = context;
     }
 
-    // This endpoint will be accessible at /api/Auth/register
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] JsonElement requestData)
     {
@@ -23,7 +22,6 @@ public class AuthController : ControllerBase
             return BadRequest("Request data is null");
         }
         
-        // Extract properties directly from JSON
         if (!requestData.TryGetProperty("username", out var usernameElement) || 
             !requestData.TryGetProperty("email", out var emailElement) ||
             !requestData.TryGetProperty("password", out var passwordElement))
@@ -35,13 +33,11 @@ public class AuthController : ControllerBase
         string email = emailElement.GetString();
         string password = passwordElement.GetString();
 
-        // Add validation
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
         {
             return BadRequest("Username, email, and password are required");
         }
 
-        // Check if user already exists
         var existingUser = await _context.Users.AnyAsync(u => u.Username == username || u.Email == email);
         if (existingUser)
         {

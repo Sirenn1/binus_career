@@ -1,153 +1,287 @@
 import React from 'react';
 import {
-  TextField,
   Grid,
-  Stack,
-  MenuItem,
-  Select,
+  TextField,
   FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Typography,
   Box,
-  IconButton,
   InputAdornment,
+  IconButton,
+  SelectChangeEvent,
 } from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-const ContactForm = () => {
+interface Props {
+  onDataChange: (data: any) => void;
+  data: {
+    contactName: string;
+    email: string;
+    phoneNumber: string;
+    mobilePhoneNumber: string;
+    password: string;
+    manageIn: string;
+    positionLevel: string;
+    jobPosition: string;
+    jobTitle: string;
+    salutation: string;
+    officeExt: string;
+    whatsapp: string;
+    line: string;
+    linkedIn: string;
+    instagram: string;
+    nameCard: File | null;
+  };
+}
+
+const Contact: React.FC<Props> = ({ onDataChange, data }) => {
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [nameCardFileName, setNameCardFileName] = React.useState<string>('');
+
+  const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    onDataChange({ [field]: event.target.value });
+  };
+
+  const handleSelectChange = (field: string) => (event: SelectChangeEvent<string>) => {
+    onDataChange({ [field]: event.target.value });
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      if (file.size > 2 * 1024 * 1024) { // 2MB check
+        alert('File size should not exceed 2MB');
+        event.target.value = ''; // Clear the file input
+        setNameCardFileName('');
+        onDataChange({ nameCard: null });
+        return;
+      }
+      setNameCardFileName(file.name);
+      onDataChange({ nameCard: file });
+    } else {
+      setNameCardFileName('');
+      onDataChange({ nameCard: null });
+    }
+  };
+
   return (
     <Box p={4}>
-      <Typography variant="h5" mb={3}>
-      </Typography>
-
-      <Grid container spacing={4}>
-        {/* Left Column */}
-        <Grid item xs={12} md={6}>
-          <Stack spacing={2}>
-            <FormControl fullWidth required>
-              <label htmlFor="contactName">Contact Name</label>
-              <TextField id="contactName" fullWidth required />
-            </FormControl>
-
-            <FormControl fullWidth required>
-              <label htmlFor="positionLevel">Position Level</label>
-              <Select id="positionLevel" defaultValue="" fullWidth>
-                <MenuItem value="Senior">Senior</MenuItem>
-                <MenuItem value="Junior">Junior</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth>
-              <label htmlFor="jobTitle">Job Title</label>
-              <TextField id="jobTitle" fullWidth />
-            </FormControl>
-
-            <FormControl fullWidth required>
-              <label htmlFor="phoneNumber">Phone Number</label>
-              <TextField id="phoneNumber" fullWidth required />
-            </FormControl>
-
-            <FormControl fullWidth required>
-              <label htmlFor="mobileNumber">Mobile Phone Number</label>
-              <TextField id="mobileNumber" fullWidth required />
-            </FormControl>
-
-            <FormControl fullWidth>
-              <label htmlFor="whatsapp">WhatsApp</label>
-              <TextField id="whatsapp" fullWidth />
-            </FormControl>
-
-            <FormControl fullWidth>
-              <label htmlFor="linkedin">LinkedIn</label>
-              <TextField id="linkedin" fullWidth />
-            </FormControl>
-
-            <FormControl fullWidth>
-              <label htmlFor="facebook">Facebook</label>
-              <TextField id="facebook" fullWidth />
-            </FormControl>
-
-            <FormControl fullWidth required>
-              <label htmlFor="password">Password</label>
-              <TextField
-                id="password"
-                type="password"
-                fullWidth
-                required
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton>
-                        <Visibility />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </FormControl>
-          </Stack>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <TextField
+              label="Contact Name"
+              value={data.contactName}
+              onChange={handleChange('contactName')}
+              required
+            />
+          </FormControl>
         </Grid>
 
-        {/* Right Column */}
         <Grid item xs={12} md={6}>
-          <Stack spacing={2}>
-            <FormControl fullWidth required>
-              <label htmlFor="manageIn">Manage In</label>
-              <Select id="manageIn" defaultValue="" fullWidth>
-                <MenuItem value="Jakarta">Jakarta</MenuItem>
-                <MenuItem value="Bandung">Bandung</MenuItem>
-              </Select>
-            </FormControl>
+          <FormControl fullWidth>
+            <InputLabel>Manage In*</InputLabel>
+            <Select
+              value={data.manageIn}
+              onChange={handleSelectChange('manageIn')}
+              label="Manage In*"
+              required
+            >
+              <MenuItem value="Department">Department</MenuItem>
+              <MenuItem value="Team">Team</MenuItem>
+              <MenuItem value="Branch">Branch</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-            <FormControl fullWidth required>
-              <label htmlFor="jobPosition">Job Position</label>
-              <Select id="jobPosition" defaultValue="" fullWidth>
-                <MenuItem value="Manager">Manager</MenuItem>
-                <MenuItem value="Staff">Staff</MenuItem>
-              </Select>
-            </FormControl>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <InputLabel>Position Level</InputLabel>
+            <Select
+              value={data.positionLevel}
+              onChange={handleSelectChange('positionLevel')}
+              label="Position Level"
+            >
+              <MenuItem value="Entry">Entry Level</MenuItem>
+              <MenuItem value="Middle">Middle Management</MenuItem>
+              <MenuItem value="Senior">Senior Management</MenuItem>
+              <MenuItem value="Executive">Executive</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-            <FormControl fullWidth required>
-              <label htmlFor="salutation">Salutation</label>
-              <Select id="salutation" defaultValue="" fullWidth>
-                <MenuItem value="Mr.">Mr.</MenuItem>
-                <MenuItem value="Ms.">Ms.</MenuItem>
-              </Select>
-            </FormControl>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <InputLabel>Job Position</InputLabel>
+            <Select
+              value={data.jobPosition}
+              onChange={handleSelectChange('jobPosition')}
+              label="Job Position"
+            >
+              <MenuItem value="Developer">Developer</MenuItem>
+              <MenuItem value="Designer">Designer</MenuItem>
+              <MenuItem value="Manager">Manager</MenuItem>
+              <MenuItem value="Director">Director</MenuItem>
+              <MenuItem value="Player">Player</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-            <FormControl fullWidth>
-              <label htmlFor="officeExt">Office Ext</label>
-              <TextField id="officeExt" placeholder="e.g. 1, 01, 003" fullWidth />
-            </FormControl>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="Job Title"
+              value={data.jobTitle}
+              onChange={handleChange('jobTitle')}
+            />
+          </FormControl>
+        </Grid>
 
-            <FormControl fullWidth required>
-              <label htmlFor="email">Email</label>
-              <TextField id="email" type="email" fullWidth required />
-            </FormControl>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <InputLabel>Salutation*</InputLabel>
+            <Select
+              value={data.salutation}
+              onChange={handleSelectChange('salutation')}
+              label="Salutation*"
+              required
+            >
+              <MenuItem value="Mr">Mr.</MenuItem>
+              <MenuItem value="Mrs">Mrs.</MenuItem>
+              <MenuItem value="Ms">Ms.</MenuItem>
+              <MenuItem value="Dr">Dr.</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-            <FormControl fullWidth>
-              <label htmlFor="line">Line</label>
-              <TextField id="line" fullWidth />
-            </FormControl>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="Office Ext"
+              value={data.officeExt}
+              onChange={handleChange('officeExt')}
+            />
+          </FormControl>
+        </Grid>
 
-            <FormControl fullWidth>
-              <label htmlFor="instagram">Instagram</label>
-              <TextField id="instagram" fullWidth />
-            </FormControl>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="Phone Number"
+              value={data.phoneNumber}
+              onChange={handleChange('phoneNumber')}
+              required
+            />
+          </FormControl>
+        </Grid>
 
-            <FormControl fullWidth>
-              <label htmlFor="nameCard">Name Card</label>
-              <TextField
-                id="nameCard"
-                type="file"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-              />
-            </FormControl>
-          </Stack>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="Mobile Phone Number"
+              value={data.mobilePhoneNumber}
+              onChange={handleChange('mobilePhoneNumber')}
+              required
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="Email"
+              type="email"
+              value={data.email}
+              onChange={handleChange('email')}
+              required
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={data.password}
+              onChange={handleChange('password')}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="WhatsApp"
+              value={data.whatsapp}
+              onChange={handleChange('whatsapp')}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="LINE"
+              value={data.line}
+              onChange={handleChange('line')}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="LinkedIn"
+              value={data.linkedIn}
+              onChange={handleChange('linkedIn')}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth>
+            <TextField
+              label="Instagram"
+              value={data.instagram}
+              onChange={handleChange('instagram')}
+            />
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <TextField
+              type="file"
+              label="Name Card"
+              InputLabelProps={{ shrink: true }}
+              onChange={handleFileChange}
+              inputProps={{
+                accept: '.jpg,.jpeg,.png,.pdf'
+              }}
+              helperText={nameCardFileName ? `Selected: ${nameCardFileName}` : 'Maximum File Size 2MB'}
+              error={false}
+            />
+          </FormControl>
         </Grid>
       </Grid>
     </Box>
   );
 };
 
-export default ContactForm;
+export default Contact;
