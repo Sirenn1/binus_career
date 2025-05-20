@@ -1,8 +1,6 @@
-import { Height } from '@mui/icons-material';
 import { SxProps, Theme } from '@mui/material';
 
 // HEADER
-
 const headerImgPitaBiru: SxProps<Theme> = {
   marginLeft: { xs: '8px', md: '16px' },
   width: '42px',
@@ -32,41 +30,14 @@ const headerBox: SxProps<Theme> = {
   marginRight: '8px',
 };
 
-const headerBoxLink: SxProps<Theme> = {
-  marginRight: '36px',
-  marginBottom: '15px',
-  display: { xs: 'none', md: 'block' },
-  color: '#2f4f4f',
-  ':hover': { color: 'grey' },
-};
-
-const headerBoxLinkTypography: SxProps<Theme> = {
-  fontFamily: 'Open Sans,sans-serif',
-  fontSize: '14px',
-  fontWeight: 700,
-};
-
 const headerBoxIcon: SxProps<Theme> = {
   position: 'relative',
   fontSize: { xs: '30px', sm: '40px' },
-  display: { xs: 'blovk', md: 'none' },
+  display: { xs: 'block', md: 'none' },
   cursor: 'pointer',
 };
 
-// OVERLAY
-
-const overlay: SxProps<Theme> = {
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'rgba(0,0,0,.6784313725490196)',
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  display: { xs: 'block', md: 'none' },
-};
-
 // SIDE MENU
-
 const sideMenu: SxProps<Theme> = {
   position: 'fixed',
   top: 0,
@@ -83,7 +54,7 @@ const sideMenuPaperBox: SxProps<Theme> = {
 };
 
 const sideMenuBoxIcon: SxProps<Theme> = {
-  mwidth: '100%',
+  width: '100%',
   height: 'auto',
   display: 'flex',
   justifyContent: 'end',
@@ -95,7 +66,7 @@ const sideMenuIcon: SxProps<Theme> = {
 };
 
 const sideMenuBoxLink: SxProps<Theme> = {
-  mwidth: '100%',
+  width: '100%',
   height: 'auto',
   display: 'flex',
   justifyContent: 'start',
@@ -115,7 +86,6 @@ const sideMenuLinkTypography: SxProps<Theme> = {
 };
 
 // FOOTER
-
 const footer: SxProps<Theme> = {
   width: '100%',
   height: '18%',
@@ -134,10 +104,7 @@ export const layoutPublicStyle = {
   headerImgLogoBinus,
   headerImgLogoBinusAlumni,
   headerBox,
-  headerBoxLink,
-  headerBoxLinkTypography,
   headerBoxIcon,
-  overlay,
   sideMenu,
   sideMenuPaperBox,
   sideMenuBoxIcon,
