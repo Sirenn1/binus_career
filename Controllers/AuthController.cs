@@ -49,7 +49,7 @@ public class AuthController : ControllerBase
             Username = username,
             Email = email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
-            IsApproved = false // New users start as not approved
+            IsApproved = false 
         };
 
         _context.Users.Add(user);
