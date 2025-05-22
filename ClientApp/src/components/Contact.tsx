@@ -51,9 +51,9 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      if (file.size > 2 * 1024 * 1024) { // 2MB check
+      if (file.size > 2 * 1024 * 1024) {
         alert('File size should not exceed 2MB');
-        event.target.value = ''; // Clear the file input
+        event.target.value = '';
         setNameCardFileName('');
         onDataChange({ nameCard: null });
         return;
@@ -75,7 +75,7 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               label="Contact Name"
               value={data.contactName}
               onChange={handleChange('contactName')}
-              required
+              required  
             />
           </FormControl>
         </Grid>

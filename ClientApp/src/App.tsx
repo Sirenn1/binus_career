@@ -29,7 +29,12 @@ const App: React.FC = () => {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                minHeight: '100vh',
+                backgroundColor: '#f5f5f5'  
+            }}>
                 <Header mobileMenu={mobileMenu} setMobileMenu={setMobileMenu} />
                 {mobileMenu && <div style={{
                     width: '100%',

@@ -118,13 +118,10 @@ const Form = () => {
     try {
       let companyId = companyData.id;
       
-      // Only create a new company if we don't have an existing company ID
       if (!companyId) {
-        // Create new company
         const companyFormData = new FormData();
         const hasCompanyLogo = companyData.companyLogo !== null;
         
-        // Log company data before submission
         console.log('Company data before submission:', {
           ...companyData,
           companyLogo: companyData.companyLogo ? {
@@ -140,7 +137,6 @@ const Form = () => {
           }
         });
 
-        // Log FormData contents
         console.log('Company FormData contents:');
         Array.from(companyFormData.entries()).forEach(([key, value]) => {
           console.log(`${key}:`, value instanceof File ? {
@@ -162,7 +158,6 @@ const Form = () => {
         console.log('Using existing company with ID:', companyId);
       }
 
-      // Then create PIC with company ID
       if (!companyId) {
         throw new Error('Failed to get or create company ID');
       }
@@ -170,7 +165,6 @@ const Form = () => {
       const picFormData = new FormData();
       const hasNameCard = picData.nameCard !== null;
       
-      // Log PIC data before submission
       console.log('PIC data before submission:', {
         ...picData,
         nameCard: picData.nameCard ? {
@@ -187,15 +181,12 @@ const Form = () => {
         }
       });
 
-      // Add companyId 
       picFormData.append('companyId', companyId.toString());
 
-      // Add nameCard file if it exists
       if (hasNameCard && picData.nameCard instanceof File) {
         picFormData.append('nameCard', picData.nameCard);
       }
 
-      // Log FormData contents
       console.log('PIC FormData contents:');
       Array.from(picFormData.entries()).forEach(([key, value]) => {
         console.log(`${key}:`, value instanceof File ? {
@@ -267,9 +258,8 @@ const Form = () => {
   };
 
   return (
-    <Box sx={{ width: '100%', p: 3 }}>
-      {/* Tab Navigation */}
-      <Box sx={{ display: 'flex', mb: 3 }}>
+    <Box sx={{ width: '95%', marginLeft: 'auto', marginRight: 'auto' }}>
+      <Box sx={{ display: 'flex', mb: 0, ml: 6 }}>
         <Box
           onClick={() => step === 2 && handleBack()}
           sx={{
@@ -304,43 +294,51 @@ const Form = () => {
         </Box>
       </Box>
 
-      {/* Form Content */}
-      <Box sx={{ p: 2 }}>
-        {step === 1 && <Contact onDataChange={handlePicDataChange} data={picData} />}
-        {step === 2 && <Company onDataChange={handleCompanyDataChange} data={companyData} />}
-      </Box>
+      <Box sx={{ 
+        backgroundColor: 'white',
+        p: 3,
+        borderBottomLeftRadius: '8px',
+        borderBottomRightRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        ml: 6,
+        mr: 6
+      }}>
+        <Box sx={{ p: 2 }}>
+          {step === 1 && <Contact onDataChange={handlePicDataChange} data={picData} />}
+          {step === 2 && <Company onDataChange={handleCompanyDataChange} data={companyData} />}
+        </Box>
 
-      {/* Navigation Buttons */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, px: 2 }}>
-        {step === 2 && (
-          <Button
-            variant="outlined"
-            onClick={handleBack}
-            disabled={loading}
-            sx={{ minWidth: 100 }}
-          >
-            Back
-          </Button>
-        )}
-        {step === 1 ? (
-          <Button
-            variant="contained"
-            onClick={handleNext}
-            disabled={loading}
-            sx={{ minWidth: 100, ml: 'auto' }}
-          >
-            Next
-          </Button>
-        ) : (
-          <Button
-            variant="contained"
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, px: 2 }}>
+          {step === 2 && (
+            <Button
+              variant="outlined"
+              onClick={handleBack}
+              disabled={loading}
+              sx={{ minWidth: 100 }}
+            >
+              Back
+            </Button>
+          )}
+          {step === 1 ? (
+            <Button
+              variant="contained"
+              onClick={handleNext}
+              disabled={loading}
+              sx={{ minWidth: 100, ml: 'auto' }}
+            >
+              Next
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
               onClick={handleSubmit}
-            disabled={loading}
-            sx={{ minWidth: 100, ml: 'auto' }}
-          >
-            {loading ? <CircularProgress size={24} /> : 'Submit'}
-          </Button>
-        )}
+              disabled={loading}
+              sx={{ minWidth: 100, ml: 'auto' }}
+            >
+              {loading ? <CircularProgress size={24} /> : 'Submit'}
+            </Button>
+          )}
+        </Box>
       </Box>
 
       <ModalAlert
