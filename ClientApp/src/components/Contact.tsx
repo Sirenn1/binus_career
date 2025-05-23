@@ -71,6 +71,7 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <FormControl fullWidth>
+            <label htmlFor="contactName">Contact Name</label>
             <TextField
               label="Contact Name"
               value={data.contactName}

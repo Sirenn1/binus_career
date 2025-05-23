@@ -62,7 +62,7 @@ public class CompanyController : ControllerBase
 
         if (companyLogo != null)
         {
-            if (companyLogo.Length > 2 * 1024 * 1024)
+            if (companyLogo.Length > 2 * 1024 * 1024) // 2MB limit
                 return BadRequest("Company logo size should not exceed 2MB");
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
@@ -120,6 +120,7 @@ public class CompanyController : ControllerBase
         var company = await _context.Companies.FindAsync(id);
         if (company == null) return NotFound();
 
+        // Delete company logo if exists
         if (!string.IsNullOrEmpty(company.CompanyLogoPath))
         {
             var filePath = Path.Combine(_environment.WebRootPath, company.CompanyLogoPath.TrimStart('/'));

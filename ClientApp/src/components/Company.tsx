@@ -109,21 +109,92 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
   const handleCompanySelect = (newValue: string | null) => {
     if (!newValue) {
       setIsExistingCompany(false);
-      onDataChange((prev: any) => ({ ...prev, companyName: '', id: null }));
+      onDataChange({
+        companyName: '',
+        id: null,
+        companyAccountUsername: '',
+        companyAddress: '',
+        country: '',
+        postalCode: '',
+        companyEmail: '',
+        phoneNumber: '',
+        companyType: '',
+        abbreviation: '',
+        province: '',
+        city: '',
+        businessType: '',
+        fax: '',
+        websiteAddress: '',
+        facebook: '',
+        instagram: '',
+        linkedIn: '',
+        twitter: '',
+        line: '',
+        bippMemberType: '',
+        companyLogo: null
+      });
       return;
     }
   
     const selectedCompany = companies.find(c => c.companyName === newValue);
     if (selectedCompany) {
       setIsExistingCompany(true);
-      onDataChange((prev: any) => ({ ...prev, ...selectedCompany }));
+      const mappedCompanyData = {
+        id: selectedCompany.id,
+        companyName: selectedCompany.companyName,
+        companyAccountUsername: selectedCompany.companyAccountUsername || '',
+        companyAddress: selectedCompany.companyAddress || '',
+        country: selectedCompany.country || '',
+        postalCode: selectedCompany.postalCode || '',
+        companyEmail: selectedCompany.companyEmail || '',
+        phoneNumber: selectedCompany.phoneNumber || '',
+        companyType: selectedCompany.companyType || '',
+        abbreviation: selectedCompany.abbreviation || '',
+        province: selectedCompany.province || '',
+        city: selectedCompany.city || '',
+        businessType: selectedCompany.businessType || '',
+        fax: selectedCompany.fax || '',
+        websiteAddress: selectedCompany.websiteAddress || '',
+        facebook: selectedCompany.facebook || '',
+        instagram: selectedCompany.instagram || '',
+        linkedIn: selectedCompany.linkedIn || '',
+        twitter: selectedCompany.twitter || '',
+        line: selectedCompany.line || '',
+        bippMemberType: selectedCompany.bippMemberType || '',
+        companyLogo: null
+      };
+      console.log('Selected company data:', mappedCompanyData);
+      onDataChange(mappedCompanyData);
     } else {
       setIsExistingCompany(false);
-      onDataChange((prev: any) => ({ ...prev, companyName: newValue, id: null }));
+      onDataChange((prev: any) => ({ 
+        ...prev, 
+        companyName: newValue, 
+        id: null,
+        companyAccountUsername: prev.companyAccountUsername || '',
+        companyAddress: prev.companyAddress || '',
+        country: prev.country || '',
+        postalCode: prev.postalCode || '',
+        companyEmail: prev.companyEmail || '',
+        phoneNumber: prev.phoneNumber || '',
+        companyType: prev.companyType || '',
+        abbreviation: prev.abbreviation || '',
+        province: prev.province || '',
+        city: prev.city || '',
+        businessType: prev.businessType || '',
+        fax: prev.fax || '',
+        websiteAddress: prev.websiteAddress || '',
+        facebook: prev.facebook || '',
+        instagram: prev.instagram || '',
+        linkedIn: prev.linkedIn || '',
+        twitter: prev.twitter || '',
+        line: prev.line || '',
+        bippMemberType: prev.bippMemberType || '',
+        companyLogo: prev.companyLogo || null
+      }));
     }
   };
 
-  // Helper function to determine if a field should be disabled
   const isFieldDisabled = () => isExistingCompany;
 
   return (
@@ -131,6 +202,9 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>
+              Company Name* {isExistingCompany && <Typography component="span" color="primary" sx={{ ml: 1, fontSize: '0.875rem' }}>(Existing Company)</Typography>}
+            </Typography>
             <Autocomplete
               value={data.companyName}
               onChange={(_, newValue) => {
@@ -148,8 +222,8 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Company Name"
-                  required
+                  variant="outlined"
+                  placeholder="Type to search existing companies or enter a new company name"
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -161,20 +235,36 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
                   }}
                 />
               )}
+              renderOption={(props, option) => (
+                <li {...props}>
+                  <Box>
+                    <Typography>{option}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Click to select existing company
+                    </Typography>
+                  </Box>
+                </li>
+              )}
               freeSolo
               autoComplete
               includeInputInList
               filterOptions={(x) => x}
             />
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              {isExistingCompany 
+                ? "Company data will be auto-filled from database" 
+                : "Enter a new company name to add a new company"}
+            </Typography>
           </FormControl>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Company Account Username*</Typography>
             <TextField
-              label="Company Account Username"
               value={data.companyAccountUsername}
               onChange={handleChange('companyAccountUsername')}
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             />
@@ -183,10 +273,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Aliases/Abbr</Typography>
             <TextField
-              label="Aliases/Abbr"
               value={data.abbreviation}
               onChange={handleChange('abbreviation')}
+              variant="outlined"
               disabled={isFieldDisabled()}
             />
           </FormControl>
@@ -194,10 +285,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Company Address*</Typography>
             <TextField
-              label="Company Address"
               value={data.companyAddress}
               onChange={handleChange('companyAddress')}
+              variant="outlined"
               required
               multiline
               rows={3}
@@ -208,11 +300,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Country*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Country*</Typography>
             <Select
               value={data.country}
               onChange={handleSelectChange('country')}
-              label="Country*"
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             >
@@ -225,11 +317,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Province*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Province*</Typography>
             <Select
               value={data.province}
               onChange={handleSelectChange('province')}
-              label="Province*"
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             >
@@ -242,11 +334,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>City*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>City*</Typography>
             <Select
               value={data.city}
               onChange={handleSelectChange('city')}
-              label="City*"
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             >
@@ -259,10 +351,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Postal Code*</Typography>
             <TextField
-              label="Postal Code"
               value={data.postalCode}
               onChange={handleChange('postalCode')}
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             />
@@ -271,11 +364,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Business Type*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Business Type*</Typography>
             <Select
               value={data.businessType}
               onChange={handleSelectChange('businessType')}
-              label="Business Type*"
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             >
@@ -289,11 +382,12 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Company Email*</Typography>
             <TextField
-              label="Company Email*"
               type="email"
               value={data.companyEmail}
               onChange={handleChange('companyEmail')}
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             />
@@ -302,10 +396,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Phone Number*</Typography>
             <TextField
-              label="Phone Number"
               value={data.phoneNumber}
               onChange={handleChange('phoneNumber')}
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             />
@@ -314,10 +409,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Fax</Typography>
             <TextField
-              label="Fax"
               value={data.fax}
               onChange={handleChange('fax')}
+              variant="outlined"
               disabled={isFieldDisabled()}
             />
           </FormControl>
@@ -325,10 +421,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Website Address</Typography>
             <TextField
-              label="Website Address"
               value={data.websiteAddress}
               onChange={handleChange('websiteAddress')}
+              variant="outlined"
               disabled={isFieldDisabled()}
             />
           </FormControl>
@@ -337,10 +434,13 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
         {['facebook', 'instagram', 'linkedIn', 'twitter', 'line'].map((platform) => (
           <Grid item xs={12} md={6} key={platform}>
             <FormControl fullWidth>
+              <Typography variant="label" sx={{ mb: 1 }}>
+                {platform.charAt(0).toUpperCase() + platform.slice(1)}
+              </Typography>
               <TextField
-                label={platform.charAt(0).toUpperCase() + platform.slice(1)}
                 value={data[platform as keyof typeof data]}
                 onChange={handleChange(platform)}
+                variant="outlined"
                 disabled={isFieldDisabled()}
               />
             </FormControl>
@@ -349,11 +449,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>BEP Member Type*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>BEP Member Type*</Typography>
             <Select
               value={data.bippMemberType}
               onChange={handleSelectChange('bippMemberType')}
-              label="BEP Member Type*"
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             >
@@ -366,11 +466,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Company Type*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Company Type*</Typography>
             <Select
               value={data.companyType}
               onChange={handleSelectChange('companyType')}
-              label="Company Type*"
+              variant="outlined"
               required
               disabled={isFieldDisabled()}
             >
@@ -385,9 +485,10 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Company Logo</Typography>
             <TextField
               type="file"
-              label="Company Logo"
+              variant="outlined"
               InputLabelProps={{ shrink: true }}
               onChange={handleFileChange}
               inputProps={{
@@ -395,7 +496,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               }}
               disabled={isFieldDisabled()}
             />
-            <Typography variant="caption" color="error">
+            <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
               *Maximum File Size 2MB
             </Typography>
           </FormControl>
