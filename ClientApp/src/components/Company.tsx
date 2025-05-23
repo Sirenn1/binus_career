@@ -108,27 +108,18 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
   const handleCompanySelect = (newValue: string | null) => {
     if (!newValue) {
-      // Clear selection
       setIsExistingCompany(false);
-      onDataChange({ companyName: '', id: null });
+      onDataChange((prev: any) => ({ ...prev, companyName: '', id: null }));
       return;
     }
-    
+  
     const selectedCompany = companies.find(c => c.companyName === newValue);
-    
     if (selectedCompany) {
-      // It's an existing company from the search
       setIsExistingCompany(true);
-      
-      // Update all company fields with data from API including the ID
-      const updatedData = {...selectedCompany};
-      
-      console.log('Selected existing company:', selectedCompany);
-      onDataChange(updatedData);
+      onDataChange((prev: any) => ({ ...prev, ...selectedCompany }));
     } else {
-      // It's a new company name entered by user
       setIsExistingCompany(false);
-      onDataChange({ companyName: newValue, id: null });
+      onDataChange((prev: any) => ({ ...prev, companyName: newValue, id: null }));
     }
   };
 
@@ -148,6 +139,10 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               inputValue={inputValue}
               onInputChange={(_, newInputValue) => {
                 setInputValue(newInputValue);
+                // Update company name immediately when typing
+                if (!companies.some(c => c.companyName === newInputValue)) {
+                  onDataChange({ companyName: newInputValue, id: null });
+                }
               }}
               options={companies.map(company => company.companyName)}
               loading={loading}
