@@ -139,7 +139,6 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               inputValue={inputValue}
               onInputChange={(_, newInputValue) => {
                 setInputValue(newInputValue);
-                // Update company name immediately when typing
                 if (!companies.some(c => c.companyName === newInputValue)) {
                   onDataChange({ companyName: newInputValue, id: null });
                 }
