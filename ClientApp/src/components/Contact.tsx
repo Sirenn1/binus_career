@@ -71,23 +71,23 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <FormControl fullWidth>
-            <label htmlFor="contactName">Contact Name</label>
+            <Typography variant="label" sx={{ mb: 1 }}>Contact Name*</Typography>
             <TextField
-              label="Contact Name"
               value={data.contactName}
               onChange={handleChange('contactName')}
-              required  
+              variant="outlined"
+              required
             />
           </FormControl>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Manage In*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Manage In*</Typography>
             <Select
               value={data.manageIn}
               onChange={handleSelectChange('manageIn')}
-              label="Manage In*"
+              variant="outlined"
               required
             >
               <MenuItem value="Department">Department</MenuItem>
@@ -99,11 +99,11 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Position Level</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Position Level</Typography>
             <Select
               value={data.positionLevel}
               onChange={handleSelectChange('positionLevel')}
-              label="Position Level"
+              variant="outlined"
             >
               <MenuItem value="Entry">Entry Level</MenuItem>
               <MenuItem value="Middle">Middle Management</MenuItem>
@@ -115,11 +115,11 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Job Position</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Job Position</Typography>
             <Select
               value={data.jobPosition}
               onChange={handleSelectChange('jobPosition')}
-              label="Job Position"
+              variant="outlined"
             >
               <MenuItem value="Developer">Developer</MenuItem>
               <MenuItem value="Designer">Designer</MenuItem>
@@ -132,21 +132,22 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Job Title</Typography>
             <TextField
-              label="Job Title"
               value={data.jobTitle}
               onChange={handleChange('jobTitle')}
+              variant="outlined"
             />
           </FormControl>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <InputLabel>Salutation*</InputLabel>
+            <Typography variant="label" sx={{ mb: 1 }}>Salutation*</Typography>
             <Select
               value={data.salutation}
               onChange={handleSelectChange('salutation')}
-              label="Salutation*"
+              variant="outlined"
               required
             >
               <MenuItem value="Mr">Mr.</MenuItem>
@@ -159,20 +160,22 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Office Ext</Typography>
             <TextField
-              label="Office Ext"
               value={data.officeExt}
               onChange={handleChange('officeExt')}
+              variant="outlined"
             />
           </FormControl>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Phone Number*</Typography>
             <TextField
-              label="Phone Number"
               value={data.phoneNumber}
               onChange={handleChange('phoneNumber')}
+              variant="outlined"
               required
             />
           </FormControl>
@@ -180,10 +183,11 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Mobile Phone Number*</Typography>
             <TextField
-              label="Mobile Phone Number"
               value={data.mobilePhoneNumber}
               onChange={handleChange('mobilePhoneNumber')}
+              variant="outlined"
               required
             />
           </FormControl>
@@ -191,11 +195,12 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Email*</Typography>
             <TextField
-              label="Email"
               type="email"
               value={data.email}
               onChange={handleChange('email')}
+              variant="outlined"
               required
             />
           </FormControl>
@@ -203,11 +208,12 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Password*</Typography>
             <TextField
-              label="Password"
               type={showPassword ? 'text' : 'password'}
               value={data.password}
               onChange={handleChange('password')}
+              variant="outlined"
               required
               InputProps={{
                 endAdornment: (
@@ -227,49 +233,54 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>WhatsApp</Typography>
             <TextField
-              label="WhatsApp"
               value={data.whatsapp}
               onChange={handleChange('whatsapp')}
+              variant="outlined"
             />
           </FormControl>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>LINE</Typography>
             <TextField
-              label="LINE"
               value={data.line}
               onChange={handleChange('line')}
+              variant="outlined"
             />
           </FormControl>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>LinkedIn</Typography>
             <TextField
-              label="LinkedIn"
               value={data.linkedIn}
               onChange={handleChange('linkedIn')}
+              variant="outlined"
             />
           </FormControl>
         </Grid>
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Instagram</Typography>
             <TextField
-              label="Instagram"
               value={data.instagram}
               onChange={handleChange('instagram')}
+              variant="outlined"
             />
           </FormControl>
         </Grid>
 
         <Grid item xs={12}>
           <FormControl fullWidth>
+            <Typography variant="label" sx={{ mb: 1 }}>Name Card</Typography>
             <TextField
               type="file"
-              label="Name Card"
+              variant="outlined"
               InputLabelProps={{ shrink: true }}
               onChange={handleFileChange}
               inputProps={{
