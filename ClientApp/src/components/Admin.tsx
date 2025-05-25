@@ -72,7 +72,13 @@ const Admin: React.FC = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button variant="contained" color="primary">
+        <Button 
+          variant="contained" 
+          sx={{ 
+            bgcolor: '#f57c00',
+            '&:hover': { bgcolor: '#e65100' }
+          }}
+        >
           SEARCH
         </Button>
       </Stack>
@@ -97,7 +103,10 @@ const Admin: React.FC = () => {
                   ) : (
                     <Button
                       variant="contained"
-                      color="primary"
+                      sx={{ 
+                        bgcolor: '#f57c00',
+                        '&:hover': { bgcolor: '#e65100' }
+                      }}
                       startIcon={<AddIcon />}
                       onClick={() => approveUser(user.id)}
                     >
