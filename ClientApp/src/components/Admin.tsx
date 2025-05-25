@@ -1,5 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import {
+  Box,
+  Button,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  Stack,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 interface User {
   id: number;
@@ -7,10 +23,12 @@ interface User {
   email: string;
   isAdmin: boolean;
   isApproved: boolean;
+  position: string;
 }
 
 const Admin: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [search, setSearch] = useState('');
 
   const fetchUsers = async () => {
     try {
@@ -24,23 +42,11 @@ const Admin: React.FC = () => {
   const approveUser = async (id: number) => {
     try {
       await axios.put(`/api/users/${id}/approve`);
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id === id ? { ...user, isApproved: true } : user
-        )
+      setUsers((prev) =>
+        prev.map((user) => (user.id === id ? { ...user, isApproved: true } : user))
       );
     } catch (error) {
       console.error('Error approving user:', error);
-    }
-  };
-
-  const rejectUser = async (id: number) => {
-    try {
-      await axios.put(`/api/users/${id}/reject`);
-      // Remove the user from the list after rejection
-      setUsers((prevUsers) => prevUsers.filter(user => user.id !== id));
-    } catch (error) {
-      console.error('Error rejecting user:', error);
     }
   };
 
@@ -48,44 +54,63 @@ const Admin: React.FC = () => {
     fetchUsers();
   }, []);
 
+  const filteredUsers = users.filter((user) =>
+    user.email.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Is Admin</th>
-            <th>Is Approved</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(({ id, username, email, isAdmin, isApproved }) => (
-            <tr key={id}>
-              <td>{username}</td>
-              <td>{email}</td>
-              <td>{isAdmin ? 'Yes' : 'No'}</td>
-              <td>{isApproved ? 'Yes' : 'No'}</td>
-              <td>
-                {!isApproved && (
-                  <>
-                    <button onClick={() => approveUser(id)}>Approve</button>
-                    <button 
-                      onClick={() => rejectUser(id)}
-                      style={{ marginLeft: '8px', backgroundColor: '#f44336', color: 'white' }}
+    <Container maxWidth="md" sx={{ mt: 5 }}>
+      <Typography variant="h5" gutterBottom>
+        Add New User
+      </Typography>
+
+      <Stack direction="row" spacing={2} mb={3}>
+        <TextField
+          fullWidth
+          label="Search by email"
+          variant="outlined"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Button variant="contained" color="primary">
+          SEARCH
+        </Button>
+      </Stack>
+
+      <TableContainer component={Paper} elevation={3}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Name</strong></TableCell>
+              <TableCell><strong>Email</strong></TableCell>
+              <TableCell><strong>Action</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredUsers.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  {user.isApproved ? (
+                    <Typography color="success.main">Approved</Typography>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      startIcon={<AddIcon />}
+                      onClick={() => approveUser(user.id)}
                     >
-                      Reject
-                    </button>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+                      Add
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 };
 
