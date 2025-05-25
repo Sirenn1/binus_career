@@ -59,67 +59,69 @@ const Admin: React.FC = () => {
   );
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Typography variant="h5" gutterBottom>
-        Add New User
-      </Typography>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', width: '100%' }}>
+      <Container maxWidth="md" sx={{ mt: 5, p: 3, borderRadius: 2 }}>
+        <Typography variant="h5" gutterBottom>
+          Add New User
+        </Typography>
 
-      <Stack direction="row" spacing={2} mb={3}>
-        <TextField
-          fullWidth
-          label="Search by email"
-          variant="outlined"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Button 
-          variant="contained" 
-          sx={{ 
-            bgcolor: '#f57c00',
-            '&:hover': { bgcolor: '#e65100' }
-          }}
-        >
-          SEARCH
-        </Button>
-      </Stack>
+        <Stack direction="row" spacing={2} mb={3}>
+          <TextField
+            fullWidth
+            label="Search by email"
+            variant="outlined"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button 
+            variant="contained" 
+            sx={{ 
+              bgcolor: '#f57c00',
+              '&:hover': { bgcolor: '#e65100' }
+            }}
+          >
+            SEARCH
+          </Button>
+        </Stack>
 
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>Name</strong></TableCell>
-              <TableCell><strong>Email</strong></TableCell>
-              <TableCell><strong>Action</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  {user.isApproved ? (
-                    <Typography color="success.main">Approved</Typography>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      sx={{ 
-                        bgcolor: '#f57c00',
-                        '&:hover': { bgcolor: '#e65100' }
-                      }}
-                      startIcon={<AddIcon />}
-                      onClick={() => approveUser(user.id)}
-                    >
-                      Add
-                    </Button>
-                  )}
-                </TableCell>
+        <TableContainer component={Paper} elevation={3}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell><strong>Name</strong></TableCell>
+                <TableCell><strong>Email</strong></TableCell>
+                <TableCell><strong>Action</strong></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Container>
+            </TableHead>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    {user.isApproved ? (
+                      <Typography color="success.main">Approved</Typography>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        sx={{ 
+                          bgcolor: '#f57c00',
+                          '&:hover': { bgcolor: '#e65100' }
+                        }}
+                        startIcon={<AddIcon />}
+                        onClick={() => approveUser(user.id)}
+                      >
+                        Add
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Container>
+    </Box>
   );
 };
 
