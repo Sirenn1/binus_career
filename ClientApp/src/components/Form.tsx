@@ -4,7 +4,7 @@ import Company from './Company';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ModalAlert } from './common/modal-alert';
-import { Box, Button, CircularProgress } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
 const Form = () => {
   const [step, setStep] = useState(1);
@@ -42,6 +42,7 @@ const Form = () => {
     postalCode: '',
     companyEmail: '',
     phoneNumber: '',
+    companyPhone: '',
     companyType: '',
     abbreviation: '',
     province: '',
@@ -89,6 +90,7 @@ const Form = () => {
     if (!companyData.id && !companyData.city) return 'City is required';
     if (!companyData.id && !companyData.postalCode) return 'Postal code is required';
     if (!companyData.id && !companyData.companyType) return 'Company type is required';
+    if (!companyData.id && !companyData.companyLogo) return 'Company logo is required';
     return null;
   };
 
@@ -120,136 +122,91 @@ const Form = () => {
       
       if (!companyId) {
         const companyFormData = new FormData();
-        const hasCompanyLogo = companyData.companyLogo !== null;
         
-        console.log('Company data before submission:', {
-          ...companyData,
-          companyLogo: companyData.companyLogo ? {
-            name: companyData.companyLogo.name,
-            type: companyData.companyLogo.type,
-            size: companyData.companyLogo.size
-          } : null
-        });
-
+        // Handle company data
         Object.entries(companyData).forEach(([key, value]) => {
-          if (key !== 'id' && value !== null) {
+          if (key === 'companyLogo') {
+            if (value instanceof File) {
+              // Ensure the file has a name
+              if (!value.name) {
+                throw new Error('Company logo file must have a name');
+              }
+              companyFormData.append('companyLogo', value, value.name);
+            } else {
+              throw new Error('Company logo must be a valid file');
+            }
+          } else if (key !== 'id' && value !== null && value !== '') {
             companyFormData.append(key, String(value));
           }
         });
 
-        console.log('Company FormData contents:');
-        Array.from(companyFormData.entries()).forEach(([key, value]) => {
-          console.log(`${key}:`, value instanceof File ? {
-            name: value.name,
-            type: value.type,
-            size: value.size
-          } : value);
-        });
+        // Log the FormData contents for debugging
+        console.log('Company Logo:', companyData.companyLogo instanceof File ? companyData.companyLogo.name : 'No file');
+        console.log('Form Data Keys:', Array.from(companyFormData.keys()));
 
         const companyRes = await axios.post('/api/company', companyFormData, {
-          headers: hasCompanyLogo ? {
+          headers: {
             'Content-Type': 'multipart/form-data'
-          } : {}
+          }
         });
-        console.log('Company response:', companyRes.data);
+        
+        if (!companyRes.data?.id) {
+          throw new Error('Failed to create company: No ID returned');
+        }
         
         companyId = companyRes.data.id;
-      } else {
-        console.log('Using existing company with ID:', companyId);
       }
 
       if (!companyId) {
-        throw new Error('Failed to get or create company ID');
+        throw new Error('Company ID is required');
       }
-      
-      const picFormData = new FormData();
-      const hasNameCard = picData.nameCard !== null;
-      
-      console.log('PIC data before submission:', {
-        ...picData,
-        nameCard: picData.nameCard ? {
-          name: picData.nameCard.name,
-          type: picData.nameCard.type,
-          size: picData.nameCard.size
-        } : null
-      });
 
-      // Add all PIC data except the nameCard
+      // Handle PIC data
+      const picFormData = new FormData();
+      
+      // Add all PIC data
       Object.entries(picData).forEach(([key, value]) => {
-        if (key !== 'nameCard' && value !== null) {
+        if (key === 'nameCard' && value instanceof File) {
+          picFormData.append(key, value);
+        } else if (value !== null && value !== '') {
           picFormData.append(key, String(value));
         }
       });
 
+      // Add company ID
       picFormData.append('companyId', companyId.toString());
-
-      if (hasNameCard && picData.nameCard instanceof File) {
-        picFormData.append('nameCard', picData.nameCard);
-      }
-
-      console.log('PIC FormData contents:');
-      Array.from(picFormData.entries()).forEach(([key, value]) => {
-        console.log(`${key}:`, value instanceof File ? {
-          name: value.name,
-          type: value.type,
-          size: value.size
-        } : value);
-      });
 
       const picRes = await axios.post('/api/pic', picFormData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log('PIC response:', picRes.data);
+
+      if (!picRes.data) {
+        throw new Error('Failed to create PIC: No response data');
+      }
 
       setShowSuccessModal(true);
     } catch (err: any) {
-      console.error('Error details:', {
-        status: err.response?.status,
-        data: err.response?.data,
-        message: err.message,
-        validationErrors: err.response?.data?.errors,
-        modelState: err.response?.data?.modelState
-      });
-
+      console.error('Registration error:', err);
+      
       let errorMessage = 'Registration failed. Please try again.';
       
       if (err.response?.data) {
         if (typeof err.response.data === 'string') {
           errorMessage = err.response.data;
-        } else if (err.response.data.title) {
-          errorMessage = err.response.data.title;
         } else if (err.response.data.message) {
           errorMessage = err.response.data.message;
         } else if (err.response.data.errors) {
           const errors = err.response.data.errors;
-          if (typeof errors === 'object') {
-            errorMessage = Object.entries(errors)
-              .map(([key, value]) => {
-                const cleanKey = key.replace(/[^a-zA-Z]/g, ' ');
-                return `${cleanKey}: ${Array.isArray(value) ? value.join(', ') : value}`;
-              })
-              .join('\n');
-          } else {
-            errorMessage = JSON.stringify(errors, null, 2);
-          }
-        } else if (err.response.data.modelState) {
-          const modelState = err.response.data.modelState;
-          errorMessage = Object.entries(modelState)
-            .map(([key, value]) => {
-              const cleanKey = key.replace(/[^a-zA-Z]/g, ' ');
-              return `${cleanKey}: ${Array.isArray(value) ? value.join(', ') : value}`;
-            })
+          errorMessage = Object.entries(errors)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
             .join('\n');
-        } else {
-          errorMessage = JSON.stringify(err.response.data, null, 2);
         }
       } else if (err.message) {
         errorMessage = err.message;
       }
 
-      console.log('Formatted error message:', errorMessage);
       setErrorMessage(errorMessage);
       setShowErrorModal(true);
     } finally {
@@ -305,7 +262,30 @@ const Form = () => {
       }}>
         <Box sx={{ p: 2 }}>
           {step === 1 && <Contact onDataChange={handlePicDataChange} data={picData} />}
-          {step === 2 && <Company onDataChange={handleCompanyDataChange} data={companyData} />}
+          {step === 2 && (
+            <>
+              <Company onDataChange={handleCompanyDataChange} data={companyData} />
+              {companyData.companyLogo && (
+                <Box mt={4} textAlign="center">
+                  <Typography variant="subtitle1" gutterBottom>
+          Logo Preview
+                  </Typography>
+                  <Box
+                    component="img"
+                    src={URL.createObjectURL(companyData.companyLogo)}
+                    alt="Company Logo Preview"
+                    sx={{
+                      maxWidth: '200px',
+                      maxHeight: '200px',
+                      borderRadius: '8px',
+                      boxShadow: 2,
+                      objectFit: 'contain'
+                    }}
+                  />
+                </Box>
+              )}
+            </>
+          )}
         </Box>
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3, px: 2 }}>

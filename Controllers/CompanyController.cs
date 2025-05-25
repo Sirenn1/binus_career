@@ -70,19 +70,40 @@ public class CompanyController : ControllerBase
             if (!allowedExtensions.Contains(extension))
                 return BadRequest("Only .jpg, .jpeg, and .png files are allowed");
 
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "company-logos");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            var uniqueFileName = $"{Guid.NewGuid()}{extension}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            if (string.IsNullOrEmpty(_environment.WebRootPath))
             {
-                await companyLogo.CopyToAsync(stream);
+                return BadRequest("WebRootPath is not configured properly");
             }
 
-            company.CompanyLogoPath = $"/uploads/company-logos/{uniqueFileName}";
+            try
+            {
+                var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "company-logos");
+                Console.WriteLine($"Upload folder path: {uploadsFolder}");
+                
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Console.WriteLine($"Creating directory: {uploadsFolder}");
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                Console.WriteLine($"File path: {filePath}");
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await companyLogo.CopyToAsync(stream);
+                }
+
+                company.CompanyLogoPath = $"/uploads/company-logos/{uniqueFileName}";
+                Console.WriteLine($"Company logo path: {company.CompanyLogoPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving file: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return BadRequest($"Error saving file: {ex.Message}");
+            }
         }
 
         _context.Companies.Add(company);
