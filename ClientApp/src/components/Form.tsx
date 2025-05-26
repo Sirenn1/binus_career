@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Contact from './Contact'; 
 import Company from './Company';
 import axios from 'axios';
@@ -56,8 +56,35 @@ const Form = () => {
     twitter: '',
     line: '',
     bippMemberType: '',
-    companyLogo: null as File | null
+    companyLogo: null as File | null,
+    companyLogoPath: ''
   });
+
+  const [existingLogoUrl, setExistingLogoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (companyData.companyLogoPath) {
+      console.log('Company logo path in Form:', companyData.companyLogoPath);
+      const baseUrl = 'https://localhost:44453'; // Updated to match the backend server port
+      const logoUrl = `${baseUrl}${companyData.companyLogoPath}`;
+      console.log('Constructed logo URL:', logoUrl);
+      console.log('Current window location:', window.location.href);
+      console.log('Base URL:', baseUrl);
+      setExistingLogoUrl(logoUrl);
+    } else {
+      console.log('No company logo path available');
+      setExistingLogoUrl(null);
+    }
+  }, [companyData.companyLogoPath]);
+
+  useEffect(() => {
+    console.log('Logo preview state:', {
+      hasCompanyLogo: !!companyData.companyLogo,
+      hasExistingLogoUrl: !!existingLogoUrl,
+      companyLogoPath: companyData.companyLogoPath,
+      existingLogoUrl
+    });
+  }, [companyData.companyLogo, existingLogoUrl, companyData.companyLogoPath]);
 
   const handlePicDataChange = (data: any) => {
     setPicData(prev => ({ ...prev, ...data }));
@@ -265,14 +292,14 @@ const Form = () => {
           {step === 2 && (
             <>
               <Company onDataChange={handleCompanyDataChange} data={companyData} />
-              {companyData.companyLogo && (
+              {(companyData.companyLogo || existingLogoUrl) && (
                 <Box mt={4} textAlign="center">
                   <Typography variant="subtitle1" gutterBottom>
-          Logo Preview
+                    Logo Preview
                   </Typography>
                   <Box
                     component="img"
-                    src={URL.createObjectURL(companyData.companyLogo)}
+                    src={companyData.companyLogo ? URL.createObjectURL(companyData.companyLogo) : existingLogoUrl || ''}
                     alt="Company Logo Preview"
                     sx={{
                       maxWidth: '200px',
@@ -280,6 +307,17 @@ const Form = () => {
                       borderRadius: '8px',
                       boxShadow: 2,
                       objectFit: 'contain'
+                    }}
+                    onError={(e) => {
+                      console.error('Error loading image:', e);
+                      console.error('Failed URL:', (e.target as HTMLImageElement).src);
+                      console.error('Image error details:', {
+                        companyLogo: companyData.companyLogo,
+                        existingLogoUrl,
+                        companyLogoPath: companyData.companyLogoPath
+                      });
+                      const img = e.target as HTMLImageElement;
+                      img.style.display = 'none';
                     }}
                   />
                 </Box>

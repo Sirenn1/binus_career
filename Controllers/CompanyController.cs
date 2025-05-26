@@ -19,7 +19,15 @@ public class CompanyController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
     {
-        return await _context.Companies.ToListAsync();
+        var companies = await _context.Companies.ToListAsync();
+        foreach (var company in companies)
+        {
+            Console.WriteLine($"Company {company.Id} - {company.CompanyName}:");
+            Console.WriteLine($"  Logo Path: '{company.CompanyLogoPath}'");
+            Console.WriteLine($"  Logo Path Type: {company.CompanyLogoPath?.GetType()}");
+            Console.WriteLine($"  Logo Path Length: {company.CompanyLogoPath?.Length ?? 0}");
+        }
+        return companies;
     }
 
     [HttpGet("{id}")]
@@ -27,6 +35,10 @@ public class CompanyController : ControllerBase
     {
         var company = await _context.Companies.FindAsync(id);
         if (company == null) return NotFound();
+        Console.WriteLine($"Company {company.Id} - {company.CompanyName}:");
+        Console.WriteLine($"  Logo Path: '{company.CompanyLogoPath}'");
+        Console.WriteLine($"  Logo Path Type: {company.CompanyLogoPath?.GetType()}");
+        Console.WriteLine($"  Logo Path Length: {company.CompanyLogoPath?.Length ?? 0}");
         return company;
     }
 
@@ -160,10 +172,28 @@ public class CompanyController : ControllerBase
     public async Task<ActionResult<IEnumerable<Company>>> SearchCompanies([FromQuery] string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            return await _context.Companies.ToListAsync();
+        {
+            var companies = await _context.Companies.ToListAsync();
+            foreach (var company in companies)
+            {
+                Console.WriteLine($"Company {company.Id} - {company.CompanyName}:");
+                Console.WriteLine($"  Logo Path: '{company.CompanyLogoPath}'");
+                Console.WriteLine($"  Logo Path Type: {company.CompanyLogoPath?.GetType()}");
+                Console.WriteLine($"  Logo Path Length: {company.CompanyLogoPath?.Length ?? 0}");
+            }
+            return companies;
+        }
 
-        return await _context.Companies
+        var filteredCompanies = await _context.Companies
             .Where(c => c.CompanyName.Contains(name))
             .ToListAsync();
+        foreach (var company in filteredCompanies)
+        {
+            Console.WriteLine($"Filtered Company {company.Id} - {company.CompanyName}:");
+            Console.WriteLine($"  Logo Path: '{company.CompanyLogoPath}'");
+            Console.WriteLine($"  Logo Path Type: {company.CompanyLogoPath?.GetType()}");
+            Console.WriteLine($"  Logo Path Length: {company.CompanyLogoPath?.Length ?? 0}");
+        }
+        return filteredCompanies;
     }
 }

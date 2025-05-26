@@ -36,6 +36,7 @@ interface CompanyData {
   twitter?: string;
   line?: string;
   bippMemberType?: string;
+  companyLogoPath?: string;
 }
 
 interface Props {
@@ -63,6 +64,7 @@ interface Props {
     line: string;
     bippMemberType: string;
     companyLogo: File | null;
+    companyLogoPath?: string;
   };
 }
 
@@ -73,16 +75,60 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
   const [isExistingCompany, setIsExistingCompany] = useState(false);
 
   useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get('/api/company');
+        console.log('Raw API response:', response.data);
+        console.log('First company in response:', response.data[0]);
+        console.log('All companies with their logo paths:', response.data.map((c: any) => ({
+          id: c.id,
+          name: c.companyName,
+          logoPath: c.companyLogoPath,
+          rawLogoPath: c.companyLogoPath
+        })));
+        setCompanies(response.data);
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        if (axios.isAxiosError(error)) {
+          console.error('Error details:', {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            headers: error.response?.headers
+          });
+        }
+      }
+    };
+
+    fetchCompanies();
+  }, []);
+
+  useEffect(() => {
     const searchCompanies = async () => {
       if (inputValue.length < 2) return;
       
       setLoading(true);
       try {
         const response = await axios.get(`/api/company/search?name=${encodeURIComponent(inputValue)}`);
-        console.log('API Response:', response.data);
+        console.log('Search API raw response:', response.data);
+        console.log('First company in search:', response.data[0]);
+        console.log('All companies from search with their logo paths:', response.data.map((c: any) => ({
+          id: c.id,
+          name: c.companyName,
+          logoPath: c.companyLogoPath,
+          rawLogoPath: c.companyLogoPath
+        })));
         setCompanies(response.data);
       } catch (error) {
         console.error('Error searching companies:', error);
+        if (axios.isAxiosError(error)) {
+          console.error('Search error details:', {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            headers: error.response?.headers
+          });
+        }
       } finally {
         setLoading(false);
       }
@@ -131,7 +177,8 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
         twitter: '',
         line: '',
         bippMemberType: '',
-        companyLogo: null
+        companyLogo: null,
+        companyLogoPath: ''
       });
       return;
     }
@@ -139,6 +186,14 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
     const selectedCompany = companies.find(c => c.companyName === newValue);
     if (selectedCompany) {
       setIsExistingCompany(true);
+      console.log('Selected company raw data:', JSON.stringify(selectedCompany, null, 2));
+      console.log('Selected company logo path:', selectedCompany.companyLogoPath);
+      console.log('Selected company logo path type:', typeof selectedCompany.companyLogoPath);
+      console.log('Selected company logo path length:', selectedCompany.companyLogoPath?.length);
+      console.log('Selected company logo path empty check:', selectedCompany.companyLogoPath === '');
+      console.log('Selected company logo path null check:', selectedCompany.companyLogoPath === null);
+      console.log('Selected company logo path undefined check:', selectedCompany.companyLogoPath === undefined);
+      
       const mappedCompanyData = {
         id: selectedCompany.id,
         companyName: selectedCompany.companyName,
@@ -161,9 +216,11 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
         twitter: selectedCompany.twitter || '',
         line: selectedCompany.line || '',
         bippMemberType: selectedCompany.bippMemberType || '',
-        companyLogo: null
+        companyLogo: null,
+        companyLogoPath: selectedCompany.companyLogoPath || ''
       };
-      console.log('Selected company data:', mappedCompanyData);
+      console.log('Mapped company data:', JSON.stringify(mappedCompanyData, null, 2));
+      console.log('Mapped company logo path:', mappedCompanyData.companyLogoPath);
       onDataChange(mappedCompanyData);
     } else {
       setIsExistingCompany(false);
@@ -190,7 +247,8 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
         twitter: prev.twitter || '',
         line: prev.line || '',
         bippMemberType: prev.bippMemberType || '',
-        companyLogo: prev.companyLogo || null
+        companyLogo: prev.companyLogo || null,
+        companyLogoPath: prev.companyLogoPath || ''
       }));
     }
   };
@@ -203,7 +261,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
         <Grid item xs={12}>
           <FormControl fullWidth>
             <Typography variant="label" sx={{ mb: 1 }}>
-              Company Name* {isExistingCompany && <Typography component="span" color="primary" sx={{ ml: 1, fontSize: '0.875rem' }}>(Existing Company)</Typography>}
+              Company Name* {isExistingCompany && <Typography component="span" color="primary" sx={{ ml: 1, fontSize: '0.875rem' }}></Typography>}
             </Typography>
             <Autocomplete
               value={data.companyName}
@@ -223,7 +281,6 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
                 <TextField
                   {...params}
                   variant="outlined"
-                  placeholder="Type to search existing companies or enter a new company name"
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -251,9 +308,6 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               filterOptions={(x) => x}
             />
             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-              {isExistingCompany 
-                ? "Company data will be auto-filled from database" 
-                : "Enter a new company name to add a new company"}
             </Typography>
           </FormControl>
         </Grid>
