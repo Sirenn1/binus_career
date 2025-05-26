@@ -29,16 +29,19 @@ interface RegisterForm {
   username: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 export default function RegisterPage() {
   const [form, setForm] = useState<RegisterForm>({
     username: "",
     email: "",
-    password: ""
+    password: "",
+    confirmPassword: ""
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -47,10 +50,27 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    
+    if (form.password !== form.confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      setShowErrorModal(true);
+      return;
+    }
+
+    if (form.password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long");
+      setShowErrorModal(true);
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await axios.post("/api/Auth/register", form);
+      const res = await axios.post("/api/Auth/register", {
+        username: form.username,
+        email: form.email,
+        password: form.password
+      });
       setSuccessMessage(res.data?.message || "Registration successful!");
       setShowSuccessModal(true);
     } catch (err: any) {
@@ -68,6 +88,10 @@ export default function RegisterPage() {
 
   const handlePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  const handleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword((prev) => !prev);
   };
 
   return (
@@ -144,6 +168,33 @@ export default function RegisterPage() {
                     </InputAdornment>
                   )
                 }}
+                helperText="Password must be at least 8 characters long"
+              />
+
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                variant="outlined"
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                value={form.confirmPassword}
+                onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                error={form.password !== form.confirmPassword && form.confirmPassword !== ""}
+                helperText={form.password !== form.confirmPassword && form.confirmPassword !== "" ? "Passwords do not match" : ""}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock color="action" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleConfirmPasswordVisibility} edge="end">
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
               />
 
               <Button
@@ -152,7 +203,7 @@ export default function RegisterPage() {
                 color="primary"
                 size="large"
                 fullWidth
-                disabled={loading}
+                disabled={loading || form.password !== form.confirmPassword}
                 sx={{ py: 1.5, fontWeight: 600, fontSize: "16px" }}
               >
                 {loading ? <CircularProgress size={24} color="inherit" /> : "REGISTER"}
