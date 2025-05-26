@@ -1,7 +1,8 @@
 import React, { useState, FormEvent } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ModalAlert } from "./common/modal-alert";
+import { useAuth } from "../contexts/AuthContext";
 import {
     Box,
     Button,
@@ -25,6 +26,10 @@ export default function Login() {
     const [errorMessage, setErrorMessage] = useState("");
     const [showErrorModal, setShowErrorModal] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const { login } = useAuth();
+
+    const from = (location.state as any)?.from?.pathname || "/";
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -32,7 +37,7 @@ export default function Login() {
 
         try {
             const res = await axios.post("/api/auth/login", form);
-            const user = res.data.user;
+            const { token, user } = res.data;
 
             if (!user.isApproved) {
                 setShowNotApprovedModal(true);
@@ -40,7 +45,13 @@ export default function Login() {
                 return;
             }
 
-            user.isAdmin ? navigate("/admin") : navigate("/Form");
+            login(token, user);
+
+            if (user.isAdmin) {
+                navigate('/admin', { replace: true });
+            } else {
+                navigate('/Form', { replace: true });
+            }
         } catch (err: any) {
             setErrorMessage("Login failed: " + (err.response?.data || err.message));
             setShowErrorModal(true);
