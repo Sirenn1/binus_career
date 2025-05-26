@@ -14,8 +14,14 @@ import {
   TextField,
   Typography,
   Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { ModalAlert } from './common/modal-alert';
 
 interface User {
   id: number;
@@ -29,6 +35,10 @@ interface User {
 const Admin: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const fetchUsers = async () => {
     try {
@@ -36,6 +46,8 @@ const Admin: React.FC = () => {
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
+      setErrorMessage('Failed to fetch users.');
+      setErrorModalOpen(true);
     }
   };
 
@@ -47,7 +59,36 @@ const Admin: React.FC = () => {
       );
     } catch (error) {
       console.error('Error approving user:', error);
+      setErrorMessage(`Failed to approve user with ID: ${id}.`);
+      setErrorModalOpen(true);
     }
+  };
+
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+
+    try {
+      await axios.put(`/api/users/${userToDelete.id}/reject`);
+      setUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+      setErrorMessage(`Failed to delete user ${userToDelete?.username || ''} : ${error.response?.data || error.message}`);
+      setErrorModalOpen(true);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
   };
 
   useEffect(() => {
@@ -62,7 +103,7 @@ const Admin: React.FC = () => {
     <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', width: '100%' }}>
       <Container maxWidth="md" sx={{ mt: 5, p: 3, borderRadius: 2 }}>
         <Typography variant="h5" gutterBottom>
-          Add New User
+          User Management
         </Typography>
 
         <Stack direction="row" spacing={2} mb={3}>
@@ -90,7 +131,8 @@ const Admin: React.FC = () => {
               <TableRow>
                 <TableCell><strong>Name</strong></TableCell>
                 <TableCell><strong>Email</strong></TableCell>
-                <TableCell><strong>Action</strong></TableCell>
+                <TableCell><strong>Status</strong></TableCell>
+                <TableCell><strong>Actions</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -102,24 +144,59 @@ const Admin: React.FC = () => {
                     {user.isApproved ? (
                       <Typography color="success.main">Approved</Typography>
                     ) : (
+                      <Typography color="warning.main">Pending</Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={1}>
+                      {!user.isApproved && (
+                        <Button
+                          variant="contained"
+                          sx={{ 
+                            bgcolor: '#4caf50',
+                            '&:hover': { bgcolor: '#388e3c' }
+                          }}
+                          startIcon={<AddIcon />}
+                          onClick={() => approveUser(user.id)}
+                        >
+                          Approve
+                        </Button>
+                      )}
                       <Button
                         variant="contained"
-                        sx={{ 
-                          bgcolor: '#f57c00',
-                          '&:hover': { bgcolor: '#e65100' }
-                        }}
-                        startIcon={<AddIcon />}
-                        onClick={() => approveUser(user.id)}
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => handleDeleteClick(user)}
                       >
-                        Add
+                        Reject
                       </Button>
-                    )}
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+
+        <ModalAlert
+          variant="failed" 
+          open={deleteDialogOpen}
+          title="Confirm Rejection"
+          message={`Are you sure you want to reject and delete ${userToDelete?.username}'s account? This action cannot be undone.`}
+          buttonTitle="Reject & Delete"
+          cancelButton={true}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+        />
+
+        <ModalAlert
+          variant="failed"
+          open={errorModalOpen}
+          title="Error"
+          message={errorMessage}
+          buttonTitle="OK"
+          onClose={() => setErrorModalOpen(false)}
+        />
       </Container>
     </Box>
   );
