@@ -511,9 +511,10 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               required
               disabled={isFieldDisabled()}
             >
-              <MenuItem value="Gold">Gold</MenuItem>
-              <MenuItem value="Silver">Silver</MenuItem>
-              <MenuItem value="Bronze">Bronze</MenuItem>
+              <MenuItem value="Diamond">Diamond</MenuItem>
+              <MenuItem value="Emerald">Emerald</MenuItem>
+              <MenuItem value="Topaz">Topaz</MenuItem>
+              <MenuItem value="Non BIPP">Non BIPP</MenuItem>
             </Select>
           </FormControl>
         </Grid>
