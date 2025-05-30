@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Grid,
   TextField,
@@ -36,16 +36,119 @@ interface Props {
   };
 }
 
+interface ValidationErrors {
+  contactName?: string;
+  email?: string;
+  phoneNumber?: string;
+  mobilePhoneNumber?: string;
+  password?: string;
+  manageIn?: string;
+  positionLevel?: string;
+  jobPosition?: string;
+  jobTitle?: string;
+  salutation?: string;
+  officeExt?: string;
+  whatsapp?: string;
+  line?: string;
+  linkedIn?: string;
+  instagram?: string;
+}
+
 const Contact: React.FC<Props> = ({ onDataChange, data }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [nameCardFileName, setNameCardFileName] = React.useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [nameCardFileName, setNameCardFileName] = useState<string>('');
+  const [errors, setErrors] = useState<ValidationErrors>({});
+
+  const validateField = (name: string, value: string): string | undefined => {
+    switch (name) {
+      case 'contactName':
+        if (!value.trim()) return 'Contact name is required';
+        if (value.length < 2) return 'Contact name must be at least 2 characters';
+        return undefined;
+      
+      case 'email':
+        if (!value.trim()) return 'Email is required';
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(value)) return 'Invalid email format';
+        return undefined;
+      
+      case 'phoneNumber':
+        if (!value.trim()) return 'Phone number is required';
+        const phoneRegex = /^[0-9+\-\s()]{8,15}$/;
+        if (!phoneRegex.test(value)) return 'Invalid phone number format';
+        return undefined;
+      
+      case 'mobilePhoneNumber':
+        if (!value.trim()) return 'Mobile phone number is required';
+        const mobileRegex = /^[0-9+\-\s()]{8,15}$/;
+        if (!mobileRegex.test(value)) return 'Invalid mobile phone number format';
+        return undefined;
+      
+      case 'password':
+        if (!value) return 'Password is required';
+        if (value.length < 8) return 'Password must be at least 8 characters';
+        if (!/[A-Z]/.test(value)) return 'Password must contain at least one uppercase letter';
+        if (!/[a-z]/.test(value)) return 'Password must contain at least one lowercase letter';
+        if (!/[0-9]/.test(value)) return 'Password must contain at least one number';
+        return undefined;
+      
+      case 'manageIn':
+        if (!value) return 'Manage In is required';
+        return undefined;
+      
+      case 'positionLevel':
+        if (!value) return 'Position Level is required';
+        return undefined;
+      
+      case 'jobPosition':
+        if (!value) return 'Job Position is required';
+        return undefined;
+      
+      case 'jobTitle':
+        if (!value.trim()) return 'Job Title is required';
+        return undefined;
+      
+      case 'salutation':
+        if (!value) return 'Salutation is required';
+        return undefined;
+      
+      case 'officeExt':
+        if (!value.trim()) return 'Office Ext is required';
+        return undefined;
+      
+      case 'whatsapp':
+        if (value && !/^[0-9+\-\s()]{8,15}$/.test(value)) return 'Invalid WhatsApp number format';
+        return undefined;
+      
+      case 'line':
+        if (value && !/^[a-zA-Z0-9._-]{3,20}$/.test(value)) return 'Invalid LINE ID format';
+        return undefined;
+      
+      case 'linkedIn':
+        if (value && !/^[a-zA-Z0-9-]{3,100}$/.test(value)) return 'Invalid LinkedIn profile format';
+        return undefined;
+      
+      case 'instagram':
+        if (value && !/^[a-zA-Z0-9._]{1,30}$/.test(value)) return 'Invalid Instagram username format';
+        return undefined;
+      
+      default:
+        return undefined;
+    }
+  };
 
   const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    onDataChange({ [field]: event.target.value });
+    const value = event.target.value;
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+    onDataChange({ [field]: value });
   };
 
   const handleSelectChange = (field: string) => (event: SelectChangeEvent<string>) => {
-    onDataChange({ [field]: event.target.value });
+    const value = event.target.value;
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+    onDataChange({ [field]: value });
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,6 +180,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleChange('contactName')}
               variant="outlined"
               required
+              error={!!errors.contactName}
+              helperText={errors.contactName}
             />
           </FormControl>
         </Grid>
@@ -89,11 +194,17 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('manageIn')}
               variant="outlined"
               required
+              error={!!errors.manageIn}
             >
               <MenuItem value="Department">Department</MenuItem>
               <MenuItem value="Team">Team</MenuItem>
               <MenuItem value="Branch">Branch</MenuItem>
             </Select>
+            {errors.manageIn && (
+              <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                {errors.manageIn}
+              </Typography>
+            )}
           </FormControl>
         </Grid>
 
@@ -104,12 +215,18 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.positionLevel}
               onChange={handleSelectChange('positionLevel')}
               variant="outlined"
+              error={!!errors.positionLevel}
             >
               <MenuItem value="Entry">Entry Level</MenuItem>
               <MenuItem value="Middle">Middle Management</MenuItem>
               <MenuItem value="Senior">Senior Management</MenuItem>
               <MenuItem value="Executive">Executive</MenuItem>
             </Select>
+            {errors.positionLevel && (
+              <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                {errors.positionLevel}
+              </Typography>
+            )}
           </FormControl>
         </Grid>
 
@@ -120,6 +237,7 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.jobPosition}
               onChange={handleSelectChange('jobPosition')}
               variant="outlined"
+              error={!!errors.jobPosition}
             >
               <MenuItem value="Developer">Developer</MenuItem>
               <MenuItem value="Designer">Designer</MenuItem>
@@ -127,6 +245,11 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               <MenuItem value="Director">Director</MenuItem>
               <MenuItem value="Player">Player</MenuItem>
             </Select>
+            {errors.jobPosition && (
+              <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                {errors.jobPosition}
+              </Typography>
+            )}
           </FormControl>
         </Grid>
 
@@ -137,6 +260,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.jobTitle}
               onChange={handleChange('jobTitle')}
               variant="outlined"
+              error={!!errors.jobTitle}
+              helperText={errors.jobTitle}
             />
           </FormControl>
         </Grid>
@@ -149,12 +274,18 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleSelectChange('salutation')}
               variant="outlined"
               required
+              error={!!errors.salutation}
             >
               <MenuItem value="Mr">Mr.</MenuItem>
               <MenuItem value="Mrs">Mrs.</MenuItem>
               <MenuItem value="Ms">Ms.</MenuItem>
               <MenuItem value="Dr">Dr.</MenuItem>
             </Select>
+            {errors.salutation && (
+              <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                {errors.salutation}
+              </Typography>
+            )}
           </FormControl>
         </Grid>
 
@@ -165,6 +296,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.officeExt}
               onChange={handleChange('officeExt')}
               variant="outlined"
+              error={!!errors.officeExt}
+              helperText={errors.officeExt}
             />
           </FormControl>
         </Grid>
@@ -177,6 +310,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleChange('phoneNumber')}
               variant="outlined"
               required
+              error={!!errors.phoneNumber}
+              helperText={errors.phoneNumber}
             />
           </FormControl>
         </Grid>
@@ -189,6 +324,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleChange('mobilePhoneNumber')}
               variant="outlined"
               required
+              error={!!errors.mobilePhoneNumber}
+              helperText={errors.mobilePhoneNumber}
             />
           </FormControl>
         </Grid>
@@ -202,6 +339,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleChange('email')}
               variant="outlined"
               required
+              error={!!errors.email}
+              helperText={errors.email}
             />
           </FormControl>
         </Grid>
@@ -215,6 +354,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               onChange={handleChange('password')}
               variant="outlined"
               required
+              error={!!errors.password}
+              helperText={errors.password}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -238,6 +379,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.whatsapp}
               onChange={handleChange('whatsapp')}
               variant="outlined"
+              error={!!errors.whatsapp}
+              helperText={errors.whatsapp}
             />
           </FormControl>
         </Grid>
@@ -249,6 +392,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.line}
               onChange={handleChange('line')}
               variant="outlined"
+              error={!!errors.line}
+              helperText={errors.line}
             />
           </FormControl>
         </Grid>
@@ -260,6 +405,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.linkedIn}
               onChange={handleChange('linkedIn')}
               variant="outlined"
+              error={!!errors.linkedIn}
+              helperText={errors.linkedIn}
             />
           </FormControl>
         </Grid>
@@ -271,6 +418,8 @@ const Contact: React.FC<Props> = ({ onDataChange, data }) => {
               value={data.instagram}
               onChange={handleChange('instagram')}
               variant="outlined"
+              error={!!errors.instagram}
+              helperText={errors.instagram}
             />
           </FormControl>
         </Grid>

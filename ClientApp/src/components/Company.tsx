@@ -68,11 +68,36 @@ interface Props {
   };
 }
 
+interface ValidationErrors {
+  companyName?: string;
+  companyAccountUsername?: string;
+  companyAddress?: string;
+  country?: string;
+  postalCode?: string;
+  companyEmail?: string;
+  phoneNumber?: string;
+  companyType?: string;
+  abbreviation?: string;
+  province?: string;
+  city?: string;
+  businessType?: string;
+  fax?: string;
+  websiteAddress?: string;
+  facebook?: string;
+  instagram?: string;
+  linkedIn?: string;
+  twitter?: string;
+  line?: string;
+  bippMemberType?: string;
+  companyLogo?: string;
+}
+
 const Company: React.FC<Props> = ({ onDataChange, data }) => {
   const [companies, setCompanies] = useState<CompanyData[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [isExistingCompany, setIsExistingCompany] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({});
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -138,17 +163,145 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
     return () => clearTimeout(timeoutId);
   }, [inputValue]);
 
-  const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    onDataChange({ [field]: event.target.value });
+  const validateField = (name: string, value: string): string | undefined => {
+    switch (name) {
+      case 'companyName':
+        if (!value.trim()) return 'Company name is required';
+        if (value.length < 2) return 'Company name must be at least 2 characters';
+        return undefined;
+
+      case 'companyAccountUsername':
+        if (!isExistingCompany && !value.trim()) return 'Company account username is required';
+        if (value && !/^[a-zA-Z0-9_-]{3,20}$/.test(value)) return 'Username must be 3-20 characters and can only contain letters, numbers, underscores, and hyphens';
+        return undefined;
+
+      case 'companyAddress':
+        if (!isExistingCompany && !value.trim()) return 'Company address is required';
+        if (value && value.length < 5) return 'Address must be at least 5 characters';
+        return undefined;
+
+      case 'country':
+        if (!isExistingCompany && !value) return 'Country is required';
+        return undefined;
+
+      case 'postalCode':
+        if (!isExistingCompany && !value.trim()) return 'Postal code is required';
+        if (value && !/^\d{5,10}$/.test(value)) return 'Invalid postal code format';
+        return undefined;
+
+      case 'companyEmail':
+        if (!isExistingCompany && !value.trim()) return 'Company email is required';
+        if (value) {
+          const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+          if (!emailRegex.test(value)) return 'Invalid email format';
+        }
+        return undefined;
+
+      case 'phoneNumber':
+        if (!isExistingCompany && !value.trim()) return 'Phone number is required';
+        if (value && !/^[0-9+\-\s()]{8,15}$/.test(value)) return 'Invalid phone number format';
+        return undefined;
+
+      case 'companyType':
+        if (!isExistingCompany && !value) return 'Company type is required';
+        return undefined;
+
+      case 'abbreviation':
+        if (value && !/^[A-Z0-9]{1,10}$/.test(value)) return 'Abbreviation must be 1-10 uppercase letters or numbers';
+        return undefined;
+
+      case 'province':
+        if (!isExistingCompany && !value) return 'Province is required';
+        return undefined;
+
+      case 'city':
+        if (!isExistingCompany && !value) return 'City is required';
+        return undefined;
+
+      case 'businessType':
+        if (!isExistingCompany && !value) return 'Business type is required';
+        return undefined;
+
+      case 'fax':
+        if (value && !/^[0-9+\-\s()]{8,15}$/.test(value)) return 'Invalid fax number format';
+        return undefined;
+
+      case 'websiteAddress':
+        if (value) {
+          try {
+            new URL(value);
+          } catch {
+            return 'Invalid website URL format';
+          }
+        }
+        return undefined;
+
+      case 'facebook':
+        if (value && !/^[a-zA-Z0-9.]{5,50}$/.test(value)) return 'Invalid Facebook username format';
+        return undefined;
+
+      case 'instagram':
+        if (value && !/^[a-zA-Z0-9._]{1,30}$/.test(value)) return 'Invalid Instagram username format';
+        return undefined;
+
+      case 'linkedIn':
+        if (value && !/^[a-zA-Z0-9-]{3,100}$/.test(value)) return 'Invalid LinkedIn profile format';
+        return undefined;
+
+      case 'twitter':
+        if (value && !/^[a-zA-Z0-9_]{1,15}$/.test(value)) return 'Invalid Twitter handle format';
+        return undefined;
+
+      case 'line':
+        if (value && !/^[a-zA-Z0-9._-]{3,20}$/.test(value)) return 'Invalid LINE ID format';
+        return undefined;
+
+      case 'bippMemberType':
+        if (!isExistingCompany && !value) return 'BIPP member type is required';
+        return undefined;
+
+      case 'companyLogo':
+        if (!isExistingCompany && !value && !data.companyLogoPath) return 'Company logo is required';
+        return undefined;
+
+      default:
+        return undefined;
+    }
   };
 
-  const handleSelectChange = (field: string) => (event: SelectChangeEvent) => {
-    onDataChange({ [field]: event.target.value });
+  const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+    onDataChange({ [field]: value });
+  };
+
+  const handleSelectChange = (field: string) => (event: SelectChangeEvent<string>) => {
+    const value = event.target.value;
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+    onDataChange({ [field]: value });
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      onDataChange({ companyLogo: event.target.files[0] });
+      const file = event.target.files[0];
+      if (file.size > 2 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, companyLogo: 'File size should not exceed 2MB' }));
+        event.target.value = '';
+        onDataChange({ companyLogo: null });
+        return;
+      }
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        setErrors(prev => ({ ...prev, companyLogo: 'Only JPG and PNG files are allowed' }));
+        event.target.value = '';
+        onDataChange({ companyLogo: null });
+        return;
+      }
+      setErrors(prev => ({ ...prev, companyLogo: undefined }));
+      onDataChange({ companyLogo: file });
+    } else {
+      onDataChange({ companyLogo: null });
     }
   };
 
@@ -272,6 +425,8 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               onInputChange={(_, newInputValue) => {
                 setInputValue(newInputValue);
                 if (!companies.some(c => c.companyName === newInputValue)) {
+                  const error = validateField('companyName', newInputValue);
+                  setErrors(prev => ({ ...prev, companyName: error }));
                   onDataChange({ companyName: newInputValue, id: null });
                 }
               }}
@@ -281,6 +436,8 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
                 <TextField
                   {...params}
                   variant="outlined"
+                  error={!!errors.companyName}
+                  helperText={errors.companyName}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -321,6 +478,8 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
               variant="outlined"
               required
               disabled={isFieldDisabled()}
+              error={!!errors.companyAccountUsername}
+              helperText={errors.companyAccountUsername}
             />
           </FormControl>
         </Grid>
@@ -540,7 +699,7 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
 
         <Grid item xs={12} md={6}>
           <FormControl fullWidth>
-            <Typography variant="label" sx={{ mb: 1 }}>Company Logo</Typography>
+            <Typography variant="label" sx={{ mb: 1 }}>Company Logo*</Typography>
             <TextField
               type="file"
               variant="outlined"
@@ -550,10 +709,9 @@ const Company: React.FC<Props> = ({ onDataChange, data }) => {
                 accept: '.jpg,.jpeg,.png'
               }}
               disabled={isFieldDisabled()}
+              error={!!errors.companyLogo}
+              helperText={errors.companyLogo || '*Maximum File Size 2MB'}
             />
-            <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
-              *Maximum File Size 2MB
-            </Typography>
           </FormControl>
         </Grid>
       </Grid>
