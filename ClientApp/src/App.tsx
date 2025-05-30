@@ -8,6 +8,7 @@ import Welcome from './components/Welcome';
 import Admin from './components/Admin';
 import RegisterPICAndCompany from './components/RegisterPICAndCompany';
 import Form from './components/Form';
+import EmailForm from './components/EmailForm';
 import { FooterPublicRoutes } from './components/layout/Footer';
 import { Header } from './components/layout/public-routes/Header';
 import { SideMenuPublicRoute } from './components/layout/SideMenu';
@@ -55,6 +56,7 @@ const App: React.FC = () => {
                             <Route path="/" element={<Welcome />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/register" element={<Register />} />
+                            <Route path="/subscribe" element={<EmailForm />} />
                             
                             {/* Protected routes */}
                             <Route path="/admin" element={
