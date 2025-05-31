@@ -48,5 +48,10 @@ namespace binusCareer.ClientApp.Model
         public int CompanyId { get; set; }
 
         public Company? Company { get; set; }
+
+        // Email verification fields
+        public bool IsEmailVerified { get; set; } = false;
+        public string? VerificationToken { get; set; }
+        public DateTime? VerificationTokenExpiry { get; set; }
     }
 }
