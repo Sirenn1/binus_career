@@ -129,7 +129,6 @@ namespace binusCareer.Controllers
             Console.WriteLine($"[DEBUG] - Email: {pic.Email}");
             Console.WriteLine($"[DEBUG] - Company ID: {pic.CompanyId}");
 
-            // Send verification email to company's email
             var verificationLink = $"{Request.Scheme}://{Request.Host}/api/PIC/verify-email?token={pic.VerificationToken}";
             Console.WriteLine($"[DEBUG] Verification Link: {verificationLink}");
             Console.WriteLine($"[DEBUG] Sending verification email to company: {company.CompanyEmail}");
@@ -161,7 +160,7 @@ namespace binusCareer.Controllers
             {
                 Console.WriteLine($"[DEBUG] Error sending verification email: {ex.Message}");
                 Console.WriteLine($"[DEBUG] Stack trace: {ex.StackTrace}");
-                throw; // Re-throw to maintain the original error handling
+                throw;
             }
 
             return CreatedAtAction(nameof(GetPIC), new { id = pic.Id }, pic);

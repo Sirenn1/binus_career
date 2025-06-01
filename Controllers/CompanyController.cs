@@ -45,7 +45,6 @@ public class CompanyController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Company>> PostCompany([FromForm] Company company, IFormFile? companyLogo)
     {
-        // Validate required fields
         if (string.IsNullOrEmpty(company.CompanyName))
             return BadRequest("Company name is required");
         if (string.IsNullOrEmpty(company.CompanyAccountUsername))
