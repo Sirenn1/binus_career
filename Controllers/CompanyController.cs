@@ -74,7 +74,7 @@ public class CompanyController : ControllerBase
 
         if (companyLogo != null)
         {
-            if (companyLogo.Length > 2 * 1024 * 1024) // 2MB limit
+            if (companyLogo.Length > 2 * 1024 * 1024) 
                 return BadRequest("Company logo size should not exceed 2MB");
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };

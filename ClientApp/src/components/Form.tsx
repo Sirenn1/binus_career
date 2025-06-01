@@ -167,10 +167,6 @@ const Form = () => {
           }
         });
 
-        // Log the FormData contents for debugging
-        console.log('Company Logo:', companyData.companyLogo instanceof File ? companyData.companyLogo.name : 'No file');
-        console.log('Form Data Keys:', Array.from(companyFormData.keys()));
-
         const companyRes = await axios.post('/api/company', companyFormData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -213,6 +209,7 @@ const Form = () => {
         throw new Error('Failed to create PIC: No response data');
       }
 
+      setLoading(false);
       setShowSuccessModal(true);
     } catch (err: any) {
       console.error('Registration error:', err);
@@ -234,10 +231,9 @@ const Form = () => {
         errorMessage = err.message;
       }
 
+      setLoading(false);
       setErrorMessage(errorMessage);
       setShowErrorModal(true);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -371,8 +367,8 @@ const Form = () => {
       <ModalAlert
         variant="success"
         open={showSuccessModal}
-        title="Success"
-        message="Registration completed successfully!"
+        title="Registration Successful"
+        message="Thank you for registering! Your application is now pending approval from your company. You will receive an email notification once your registration has been approved. Please check your email regularly."
         buttonTitle="OK"
         onClose={() => {
           setShowSuccessModal(false);
