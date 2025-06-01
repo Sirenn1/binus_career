@@ -115,9 +115,8 @@ namespace binusCareer.Controllers
                 pic.NameCardPath = $"/uploads/name-cards/{uniqueFileName}";
             }
 
-            // Generate verification token
             pic.VerificationToken = GenerateVerificationToken();
-            pic.VerificationTokenExpiry = DateTime.UtcNow.AddHours(24); // Token expires in 24 hours
+            pic.VerificationTokenExpiry = DateTime.UtcNow.AddHours(24); 
             pic.IsEmailVerified = false;
             pic.Password = BCrypt.Net.BCrypt.HashPassword(pic.Password);
 
