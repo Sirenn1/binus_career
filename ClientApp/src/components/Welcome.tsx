@@ -20,37 +20,70 @@ export const Welcome: React.FC = () => {
                 <Typography sx={loginStyle.contentStackBoxTypography1}>
                     Welcome to Binus Career
                 </Typography>
-                <Typography sx={loginStyle.contentStackBoxTypography2}>
-                    Discover and Unlock Opportunities with Binus Career
-                </Typography>
+                <Typography
+  sx={{
+    textAlign: 'justify',
+    fontSize: '16px',
+    lineHeight: 1.8,
+    color: '#fff', 
+    maxWidth: '600px',      
+    marginTop: '10px',
+    marginBottom: '20px',
+    fontFamily: 'Segoe UI'
+  }}
+>
+  BINUS CAREER is an authorized job-portal established by Bina Nusantara University. 
+  Our aim is to accomplish Bina Nusantara Quality Targets and to assist BINUSIANS 
+  in seeking employment & better career chances in accordance to each preferences and abilities.
+</Typography>
                 <Divider sx={loginStyle.contentStackBoxDivider} />
 
                 <LoadingButton
                     variant="contained"
                     sx={{
                         ...loginStyle.contentStackBoxLoginButton,
-                        backgroundColor: '#F48D0C', 
+                        marginTop: '20px',
+                        backgroundColor: 'white',
+                        borderColor: '#ccc',
+                        color: '#7E7E7E',
+                        width: '400px',
                         '&:hover': {
-                            backgroundColor: '#D47A08', 
+                            backgroundColor: '#f5f5f5',
+                            borderColor: '#aaa',
                         },
-                        color: 'white',
                         fontWeight: 'bold',
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
                     }}
                     onClick={handleLogin}
                 >
                     <Box component="img" src="/assets/logo/microsoft.png" alt="Microsoft" sx={{ width: 20 }} />
-                    <Typography fontFamily="Segoe UI" fontSize={15} fontWeight={600} color="white">
-                        Sign in with Microsoft
+                    <Typography fontFamily="Segoe UI" fontSize={15} fontWeight={600}>
+                        SIGN IN AS SUPER ADMIN/JOB SEEKER
                     </Typography>
                 </LoadingButton>
 
-                <Typography sx={loginStyle.contentStackBoxTypography3}>
-                    For More Information, please contact: asutomo@binus.edu, career@binus.edu
-                </Typography>
-                <Typography sx={loginStyle.contentStackBoxTypography4}>
-                    ext. 1234, 1235
-                </Typography>
+                <LoadingButton
+                    variant="outlined"
+                    sx={{
+                        ...loginStyle.contentStackBoxLoginButton,
+                        marginTop: '20px',
+                        backgroundColor: 'white',
+                        borderColor: '#ccc',
+                        color: '#7E7E7E',
+                        width: '400px',
+                        '&:hover': {
+                            backgroundColor: '#f5f5f5',
+                            borderColor: '#aaa',
+                        },
+                        fontWeight: 'bold',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                    }}
+                    onClick={() => navigate('/login-pic')}
+                >
+                    <Typography fontFamily="Segoe UI" fontSize={13} fontWeight={500}>
+                        SIGN IN AS PIC COMPANY
+                    </Typography>
+                </LoadingButton>
             </Box>
 
             <Box
