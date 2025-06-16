@@ -10,14 +10,18 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://localhost:44453")
+        policy.AllowAnyOrigin()
               .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowAnyHeader();
     });
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -32,15 +36,30 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
 // CORS must be between UseRouting and UseEndpoints
 app.UseCors();
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+// Add authentication and authorization middleware
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapControllers();
+// Configure endpoints
+app.MapControllerRoute(
+    name: "default",
+    pattern: "api/{controller}/{action=Index}/{id?}");
+
 app.MapFallbackToFile("index.html");
 
+// Enable Swagger in development
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+
+app.Run();
 app.Run();

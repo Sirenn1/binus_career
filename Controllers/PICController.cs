@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using BCrypt.Net;
 using System.Text.RegularExpressions;
 using binusCareer.Services;
+using System.Text.Json;
 
 namespace binusCareer.Controllers
 {
@@ -292,6 +293,72 @@ namespace binusCareer.Controllers
             _context.PICs.Remove(pic);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpPost("login")]
+        [Route("login")]
+        public async Task<IActionResult> Login([FromBody] JsonElement requestData)
+        {
+            Console.WriteLine("\n[DEBUG] Starting PIC login process...");
+            try
+            {
+                if (!requestData.TryGetProperty("email", out var emailElement) || 
+                    !requestData.TryGetProperty("password", out var passwordElement))
+                {
+                    Console.WriteLine("[DEBUG] Missing email or password in request");
+                    return BadRequest(new { message = "Email and password are required" });
+                }
+
+                string email = emailElement.GetString();
+                string password = passwordElement.GetString();
+
+                Console.WriteLine($"[DEBUG] Attempting login for email: {email}");
+
+                var pic = await _context.PICs
+                    .Include(p => p.Company)
+                    .FirstOrDefaultAsync(p => p.Email == email);
+
+                if (pic == null)
+                {
+                    Console.WriteLine("[DEBUG] No PIC found with provided email");
+                    return Unauthorized(new { message = "Invalid email or password" });
+                }
+
+                Console.WriteLine("[DEBUG] PIC found, verifying password...");
+                if (!BCrypt.Net.BCrypt.Verify(password, pic.Password))
+                {
+                    Console.WriteLine("[DEBUG] Password verification failed");
+                    return Unauthorized(new { message = "Invalid email or password" });
+                }
+
+                Console.WriteLine("[DEBUG] Password verified, checking email verification status...");
+                if (!pic.IsEmailVerified)
+                {
+                    Console.WriteLine("[DEBUG] Email not verified");
+                    return Unauthorized(new { message = "Email not verified. Please check your company email for verification." });
+                }
+
+                Console.WriteLine("[DEBUG] Login successful, preparing response...");
+                var response = new { 
+                    message = "Login successful",
+                    pic = new {
+                        id = pic.Id,
+                        email = pic.Email,
+                        contactName = pic.ContactName,
+                        companyId = pic.CompanyId,
+                        companyName = pic.Company?.CompanyName
+                    }
+                };
+
+                Console.WriteLine("[DEBUG] Sending successful response");
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DEBUG] Exception occurred during login: {ex.Message}");
+                Console.WriteLine($"[DEBUG] Stack trace: {ex.StackTrace}");
+                return StatusCode(500, new { message = "An internal server error occurred" });
+            }
         }
     }
 

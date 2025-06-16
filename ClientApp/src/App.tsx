@@ -14,6 +14,7 @@ import { Header } from './components/layout/public-routes/Header';
 import { SideMenuPublicRoute } from './components/layout/SideMenu';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
+import { PICLogin } from './components/PICLogin';
 
 const theme = createTheme({
   palette: {
@@ -55,6 +56,7 @@ const App: React.FC = () => {
                             {/* Public routes */}
                             <Route path="/" element={<Welcome />} />
                             <Route path="/login" element={<Login />} />
+                            <Route path="/login-pic" element={<PICLogin />} />
                             <Route path="/register" element={<Register />} />
                             <Route path="/subscribe" element={<EmailForm />} />
                             
